@@ -7,8 +7,8 @@ class AppRoutes {
   static const String profile = '/profile';
 
   // auth
-  static const String login = '/login';
-  static const String register = 'register';
+  static const String login = '/signIn';
+  static const String register = '/register';
 
   // on boarding
   static const String onboarding = '/onboarding';

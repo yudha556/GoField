@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gosport/core/router/app_routes.dart';
+import 'package:gofield/core/router/app_routes.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -43,23 +43,18 @@ class _SplashPageState extends State<SplashPage>
       curve: Curves.easeOutBack,
     ));
     
-    // Start fade in + scale animation
     _animationController.forward();
     
-    // Setup navigation with fade out
     _setupNavigation();
   }
 
   void _setupNavigation() {
     print('SplashPage: Setting up navigation sequence');
     
-    // Wait 2.5 seconds, then start fade out
     Future.delayed(const Duration(milliseconds: 2500), () {
       if (mounted) {
         print('SplashPage: Starting fade out animation');
-        // Start fade out + scale down
         _animationController.reverse().then((_) {
-          // After fade out completes, navigate
           if (mounted) {
             print('SplashPage: Fade out complete, navigating to login');
             context.go(AppRoutes.login);

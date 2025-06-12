@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gosport/app/splash/page.dart';
-import 'package:gosport/core/router/app_routes.dart';
-// import 'package:gosport/app/auth/register/page.dart';
-import 'package:gosport/app/auth/signIn/page.dart';
-// import 'package:gosport/app/app/home/page.dart';
-// import 'package:gosport/app/app/profile/page.dart';
-// import 'package:gosport/main.dart';
+import 'package:gofield/app/splash/page.dart';
+import 'package:gofield/core/router/app_routes.dart';
+import 'package:gofield/app/auth/register/page.dart';
+import 'package:gofield/app/auth/signIn/page.dart';
+// import 'package:gofield/app/app/home/page.dart';
+// import 'package:gofield/app/app/profile/page.dart';
+// import 'package:gofield/main.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -32,11 +32,14 @@ class AppRouter {
           return const LoginPage();
         },
       ),
-      // GoRoute(
-      //   path: AppRoutes.register,
-      //   name: 'Register',
-      //   builder: (context, state) => const RegisterPage();
-      // ),
+      GoRoute(
+        path: AppRoutes.register,
+        name: 'Register',
+        builder: (context, state) {
+          print('Router: Building Register page');
+          return const RegisterPage();
+        },
+      ),
 
       // main app
       // GoRoute(
