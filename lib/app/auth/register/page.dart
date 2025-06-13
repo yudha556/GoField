@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; 
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gofield/core/router/app_routes.dart'; 
-import 'package:flutter/gestures.dart'; 
+import 'package:gofield/core/router/app_routes.dart';
+import 'package:flutter/gestures.dart';
+import 'package:gofield/core/components/components.dart'; 
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -15,7 +16,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _agreeToTerms = false;
 
@@ -36,7 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => context.pop(), 
+          onPressed: () => context.pop(),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -146,11 +148,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                     activeColor: Colors.blue,
                   ),
-                  Expanded( 
+                  Expanded(
                     child: RichText(
                       text: TextSpan(
                         text: 'Saya menyetujui ',
-                        style: const TextStyle(color: Colors.black, fontSize: 14),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                        ),
                         children: <TextSpan>[
                           TextSpan(
                             text: 'Syarat dan Ketentuan',
@@ -162,7 +167,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 print('Terms and Conditions clicked!');
-                                // context.pushNamed(AppRoutes.termsAndConditions); 
+                                // context.pushNamed(AppRoutes.termsAndConditions);
                               },
                           ),
                         ],
@@ -173,28 +178,22 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 20.0),
 
-              // --- Tombol Daftar ---
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Tambahkan logika pendaftaran di sini
+              // --- Tombol Daftar 
+              PrimaryButton(
+                text: 'Daftar',
+                isFullWidth: true,
+                isLoading: false, 
+                onPressed: _agreeToTerms ? () {
+                  context.go(AppRoutes.verify);
                   print('Register button pressed!');
                   print('Nama: ${_nameController.text}');
                   print('Email: ${_emailController.text}');
                   print('Password: ${_passwordController.text}');
-                  print('Konfirmasi Password: ${_confirmPasswordController.text}');
+                  print(
+                    'Konfirmasi Password: ${_confirmPasswordController.text}',
+                  );
                   print('Setuju S&K: $_agreeToTerms');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 13.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                child: const Text(
-                  'Daftar',
-                  style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                ),
+                } : null, 
               ),
               const SizedBox(height: 24.0),
 
@@ -214,7 +213,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 20.0),
 
-              // --- Google Icon ---
+              // --- Google Icon Button ---
               Center(
                 child: InkWell(
                   onTap: () {
@@ -222,24 +221,33 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                   borderRadius: BorderRadius.circular(28.0),
                   child: Container(
-                    width: 46.0,
-                    height: 46.0,
+                    width: 56.0,
+                    height: 56.0,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey[400]!),
+                      border: Border.all(color: Colors.grey[300]!, width: 1.5),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: SvgPicture.asset(
-                      'assets/icons/icons-google.svg', 
-                      height: 20.0,
-                      width: 20.0,
+                      'assets/icons/icons-google.svg',
+                      height: 24.0,
+                      width: 24.0,
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 30.0),
 
-              // --- Sudah punya akun? Sign In ---
+              // --- Sudah punya akun? Sign In 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -247,18 +255,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     'Sudah punya akun?',
                     style: TextStyle(color: Colors.black),
                   ),
-                  TextButton(
+                  LinkButton(
+                    text: 'Masuk',
+                    size: ButtonSize.small,
                     onPressed: () {
                       print('Sign In button pressed!');
-                      context.goNamed(AppRoutes.login);
+                      context.go(AppRoutes.login);
                     },
-                    child: const Text(
-                      'Masuk',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
                 ],
               ),
@@ -278,7 +281,10 @@ class TermsAndConditionsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Syarat dan Ketentuan', style: TextStyle(color: Colors.black)),
+        title: const Text(
+          'Syarat dan Ketentuan',
+          style: TextStyle(color: Colors.black),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(

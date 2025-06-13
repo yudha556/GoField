@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
+import 'package:gofield/core/components/components.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -66,41 +67,27 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 5.0),
 
-              // lupa password button
+              // lupa password button 
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(
+                child: LinkButton(
+                  text: 'Lupa Password?',
+                  size: ButtonSize.small,
                   onPressed: () {
                     print('Forgot password pressed');
                   },
-                  child: const Text(
-                    'Lupa Password?',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ),
               const SizedBox(height: 20.0),
 
-              // login button
-              ElevatedButton(
+              // login button 
+              PrimaryButton(
+                text: 'Login',
+                size: ButtonSize.medium,
+                isFullWidth: true,
                 onPressed: () {
                   print('Login button pressed!');
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 13.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                child: const Text(
-                  'Login',
-                  style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-                ),
               ),
               const SizedBox(height: 24.0),
 
@@ -119,7 +106,7 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 20.0),
 
-              // google icon
+              // google icon button 
               Center(
                 child: InkWell(
                   onTap: () {
@@ -127,24 +114,33 @@ class LoginPage extends StatelessWidget {
                   },
                   borderRadius: BorderRadius.circular(28.0),
                   child: Container(
-                    width: 46.0,
-                    height: 46.0,
+                    width: 56.0,
+                    height: 56.0,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.grey[400]!),
+                      border: Border.all(color: Colors.grey[300]!, width: 1.5),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: SvgPicture.asset(
                       'assets/icons/icons-google.svg',
-                      height: 20.0,
-                      width: 20.0,
+                      height: 24.0,
+                      width: 24.0,
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 30.0),
 
-              // register button
+              // register button 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -152,18 +148,13 @@ class LoginPage extends StatelessWidget {
                     'Belum punya akun?',
                     style: TextStyle(color: Colors.black),
                   ),
-                  TextButton(
+                  LinkButton(
+                    text: 'Daftar Sekarang',
+                    size: ButtonSize.small,
                     onPressed: () {
                       context.push(AppRoutes.register);
-                      print('Register button presed');
+                      print('Register button pressed');
                     },
-                    child: const Text(
-                      'Daftar Sekarang',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
                 ],
               ),

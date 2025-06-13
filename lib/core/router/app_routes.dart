@@ -9,6 +9,7 @@ class AppRoutes {
   // auth
   static const String login = '/signIn';
   static const String register = '/register';
+  static const String verify = '/otpVerify';
 
   // on boarding
   static const String onboarding = '/onboarding';

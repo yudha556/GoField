@@ -94,7 +94,7 @@ class _SplashPageState extends State<SplashPage>
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: SvgPicture.asset(
-                    'assets/icons/goSportLogo.svg',
+                    'assets/icons/GoFieldLogo.svg',
                     width: 250,
                     height: 60,
                   ),

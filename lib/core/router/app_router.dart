@@ -4,6 +4,7 @@ import 'package:gofield/app/splash/page.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/auth/register/page.dart';
 import 'package:gofield/app/auth/signIn/page.dart';
+import 'package:gofield/app/auth/register/components/otpVerify.dart';
 // import 'package:gofield/app/app/home/page.dart';
 // import 'package:gofield/app/app/profile/page.dart';
 // import 'package:gofield/main.dart';
@@ -38,6 +39,14 @@ class AppRouter {
         builder: (context, state) {
           print('Router: Building Register page');
           return const RegisterPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.verify,
+        name: 'verify',
+        builder: (context, state) {
+          print('Router: Building verify page');
+          return const VerifyPage();
         },
       ),
 
