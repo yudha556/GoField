@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gofield/app/splash/page.dart';
+import 'package:gofield/app/views/splash/page.dart';
 import 'package:gofield/core/router/app_routes.dart';
-import 'package:gofield/app/auth/register/page.dart';
-import 'package:gofield/app/auth/signIn/page.dart';
-import 'package:gofield/app/auth/register/components/otpVerify.dart';
-// import 'package:gofield/app/app/home/page.dart';
-// import 'package:gofield/app/app/profile/page.dart';
-// import 'package:gofield/main.dart';
+import 'package:gofield/app/views/auth/register/page.dart';
+import 'package:gofield/app/views/auth/signIn/page.dart';
+import 'package:gofield/app/views/auth/register/components/otpVerify.dart';
+import 'package:gofield/app/views/admin/app/home/page.dart' as AdminHome;
+import 'package:gofield/app/views/owner/app/home/page.dart' as OwnerHome;
+import 'package:gofield/app/views/user/app/home/page.dart' as UserHome;
+import 'package:gofield/app/views/user/app/jadwal/page.dart' as UserJadwal;
+import 'package:gofield/app/views/user/app/profile/page.dart' as UserProfile;
+import 'package:gofield/app/views/user/app/promo/page.dart' as UserPromo;
+import 'package:gofield/app/views/user/app/transaksi/page.dart' as UserTransaksi;
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -50,17 +54,65 @@ class AppRouter {
         },
       ),
 
-      // main app
-      // GoRoute(
-      //   path: AppRoutes.home,
-      //   name: 'home',
-      //   builder: (context, state) => const HomePage(),
-      // ),
-      // GoRoute(
-      //   path: AppRoutes.profile,
-      //   name: 'profile',
-      //   builder: (context, state) => const ProfilePage(),
-      // ),
+      // role-based dashboard
+      GoRoute(
+        path: AppRoutes.adminDashboard,
+        name: 'AdminDashboard',
+        builder: (context, state) {
+          print('Router: Building Admin Dashboard');
+          return const AdminHome.AdminPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.ownerDashboard,
+        name: 'OwnerDashboard',
+        builder: (context, state) {
+          print('Router: Building Owner Dashboard');
+          return const OwnerHome.OwnerPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.userDashboard,
+        name: 'UserDashboard',
+        builder: (context, state) {
+          print('Router: Building User Dashboard');
+          return const UserHome.UserPage();
+        },
+      ),
+
+      // user page
+      GoRoute(
+        path: AppRoutes.jadwalPage,
+        name: 'JadwalPage',
+        builder: (context, state) {
+          print('Router: Building User Page');
+          return const UserJadwal.JadwalPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.transaksiPage,
+        name: 'TransaksiPage',
+        builder: (context, state) {
+          print('Router: Building Transaksi Page');
+          return const UserTransaksi.TransaksiPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.promoPage,
+        name: 'PromoPage',
+        builder: (context, state) {
+          print('Router: Building Promo Page');
+          return const UserPromo.PromoPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.profilePage,
+        name: 'ProfilPage',
+        builder: (context, state) {
+          print('Router: Building Profile Page');
+          return const UserProfile.ProfilePage();
+        },
+      ),
     ],
 
     errorBuilder: (context, state) {
