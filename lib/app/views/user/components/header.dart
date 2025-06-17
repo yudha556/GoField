@@ -37,52 +37,53 @@ class HeaderBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        children: [
-          // Top Row - Actions
-          Row(
-            children: [
-              const Spacer(),
-              
-              // Action Buttons
-              Row(
-                children: [
-                  if (showNotification) ...[
-                    NotificationButton(
-                      notificationCount: notificationCount,
-                      onTap: onNotificationTap,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  
-                  if (showCart) ...[
-                    CartButton(
-                      itemCount: cartItemCount,
-                      onTap: onCartTap,
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  
-                  if (showProfile)
-                    ProfileButton(
-                      profileImageUrl: profileImageUrl,
-                      onTap: onProfileTap,
-                    ),
-                ],
-              ),
-            ],
-          ),
-          
-          // Search Bar
-          if (showSearch) ...[
-            const SizedBox(height: 12),
-            SearchBarComponent(
-              hintText: searchHint ?? 'Cari lapangan...',
-              onTap: onSearchTap,
+      // padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
-        ],
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        child: Row(
+          children: [
+            // Notification Button
+            if (showNotification) ...[
+              NotificationButton(
+                notificationCount: notificationCount,
+                onTap: onNotificationTap,
+              ),
+              const SizedBox(width: 18),
+            ],
+        
+            // Cart Button
+            if (showCart) ...[
+              CartButton(itemCount: cartItemCount, onTap: onCartTap),
+              const SizedBox(width: 18),
+            ],
+        
+            // Search Bar - mengambil space yang tersisa
+            if (showSearch) ...[
+              Expanded(
+                child: SearchBarComponent(
+                  hintText: searchHint ?? 'Cari lapangan...',
+                  onTap: onSearchTap,
+                ),
+              ),
+              const SizedBox(width: 18),
+            ],
+        
+            // Profile Button
+            if (showProfile)
+              ProfileButton(profileImageUrl: null, onProfiletap: null),
+          ],
+        ),
       ),
     );
   }
@@ -115,17 +116,31 @@ class ActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HeaderBar(
-      showSearch: false,
-      showNotification: showNotification,
-      showCart: showCart,
-      showProfile: showProfile,
-      notificationCount: notificationCount,
-      cartItemCount: cartItemCount,
-      profileImageUrl: profileImageUrl,
-      onNotificationTap: onNotificationTap,
-      onCartTap: onCartTap,
-      onProfileTap: onProfileTap,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          // Notification Button
+          if (showNotification) ...[
+            NotificationButton(
+              notificationCount: notificationCount,
+              onTap: onNotificationTap,
+            ),
+            const SizedBox(width: 8),
+          ],
+
+          // Cart Button
+          if (showCart) ...[
+            CartButton(itemCount: cartItemCount, onTap: onCartTap),
+            const SizedBox(width: 8),
+          ],
+
+          const Spacer(), // Mendorong profile button ke kanan
+          // Profile Button
+          if (showProfile)
+            ProfileButton(onProfiletap: null, profileImageUrl: null,)
+        ],
+      ),
     );
   }
 }
@@ -135,20 +150,22 @@ class SearchOnlyBar extends StatelessWidget {
   final String? searchHint;
   final VoidCallback? onSearchTap;
 
-  const SearchOnlyBar({
-    super.key,
-    this.searchHint,
-    this.onSearchTap,
-  });
+  const SearchOnlyBar({super.key, this.searchHint, this.onSearchTap});
 
   @override
   Widget build(BuildContext context) {
-    return HeaderBar(
-      searchHint: searchHint,
-      showNotification: false,
-      showCart: false,
-      showProfile: false,
-      onSearchTap: onSearchTap,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: SearchBarComponent(
+              hintText: searchHint ?? 'Cari lapangan...',
+              onTap: onSearchTap,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

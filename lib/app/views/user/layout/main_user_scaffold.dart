@@ -26,7 +26,22 @@ class MainUserScaffold extends StatelessWidget {
           )
         : null,
       body: child,
-      bottomNavigationBar: showNavBar ? _buildBottomNavBar(context) : null,
+      
+      bottomNavigationBar: showNavBar ? Container(
+
+        padding: EdgeInsets.symmetric(vertical: 2),
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, -1),
+            ),
+          ],
+        ),
+        child: _buildBottomNavBar(context),
+      ) : null,
     );
   }
 
