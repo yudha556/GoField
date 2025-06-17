@@ -76,13 +76,13 @@ class AppRouter {
         name: 'UserDashboard',
         builder: (context, state) {
           print('Router: Building User Dashboard');
-          return const UserHome.UserPage();
+          return const UserHome.UserHomePage();
         },
       ),
 
       // user page
       GoRoute(
-        path: AppRoutes.jadwalPage,
+        path: AppRoutes.userjadwalPage,
         name: 'JadwalPage',
         builder: (context, state) {
           print('Router: Building User Page');
@@ -90,7 +90,7 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: AppRoutes.transaksiPage,
+        path: AppRoutes.usertransaksiPage,
         name: 'TransaksiPage',
         builder: (context, state) {
           print('Router: Building Transaksi Page');
@@ -98,7 +98,7 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: AppRoutes.promoPage,
+        path: AppRoutes.userpromoPage,
         name: 'PromoPage',
         builder: (context, state) {
           print('Router: Building Promo Page');
@@ -106,7 +106,7 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: AppRoutes.profilePage,
+        path: AppRoutes.userprofilePage,
         name: 'ProfilPage',
         builder: (context, state) {
           print('Router: Building Profile Page');
