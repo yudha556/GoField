@@ -11,7 +11,10 @@ import 'package:gofield/app/views/user/app/home/page.dart' as UserHome;
 import 'package:gofield/app/views/user/app/jadwal/page.dart' as UserJadwal;
 import 'package:gofield/app/views/user/app/profile/page.dart' as UserProfile;
 import 'package:gofield/app/views/user/app/promo/page.dart' as UserPromo;
-import 'package:gofield/app/views/user/app/transaksi/page.dart' as UserTransaksi;
+import 'package:gofield/app/views/user/app/transaksi/page.dart'
+    as UserTransaksi;
+import 'package:gofield/app/views/user/app/home/components/list.dart'
+    as userListPage;
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -113,6 +116,14 @@ class AppRouter {
           return const UserProfile.ProfilePage();
         },
       ),
+      // GoRoute(
+      //   path: AppRoutes.userListPage,
+      //   name: 'List Id',
+      //   builder: (context, state) {
+      //     print('Builder List Page');
+      //     return const userListPage.ListPage();
+      //   },
+      // ),
     ],
 
     errorBuilder: (context, state) {
