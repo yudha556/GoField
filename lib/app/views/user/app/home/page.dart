@@ -117,7 +117,7 @@ class HomeContent extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 0),
                     child: SizedBox(
-                      height: 80,
+                      height: 60,
                       width: double.infinity,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
@@ -259,20 +259,20 @@ class HomeContent extends StatelessWidget {
           // Navigator.pushNamed(context, AppRoutes.userListPage);
         },
         child: Container(
-          width: 80,
+          width: 60,
           margin: const EdgeInsets.only(right: 18),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(50),
             border: Border.all(color: Colors.grey.shade200),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
+            // boxShadow: [
+            //   BoxShadow(
+            //     color: Colors.grey.withOpacity(0.3),
+            //     spreadRadius: 2,
+            //     blurRadius: 2,
+            //     offset: const Offset(0, 1),
+            //   ),
+            // ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
