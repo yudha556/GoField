@@ -17,6 +17,7 @@ class MainUserScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: title != null 
         ? AppBar(
             title: Text(title!),
@@ -28,9 +29,11 @@ class MainUserScaffold extends StatelessWidget {
       body: child,
       
       bottomNavigationBar: showNavBar ? Container(
-
+        
+        height: 70,
         padding: EdgeInsets.symmetric(vertical: 2),
         decoration: BoxDecoration(
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.3),
@@ -50,29 +53,30 @@ class MainUserScaffold extends StatelessWidget {
     
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
       currentIndex: _getCurrentIndex(currentLocation),
       onTap: (index) => _onNavBarTap(context, index),
       selectedItemColor: Colors.blue,
       unselectedItemColor: Colors.grey,
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(Icons.home_outlined),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.schedule),
+          icon: Icon(Icons.schedule_outlined),
           label: 'Jadwal',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.receipt),
+          icon: Icon(Icons.receipt_outlined),
           label: 'Transaksi',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.local_offer),
+          icon: Icon(Icons.discount_outlined),
           label: 'Promo',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person),
+          icon: Icon(Icons.person_outline),
           label: 'Profile',
         ),
       ],

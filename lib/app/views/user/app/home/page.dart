@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/app/views/user/components/header.dart';
+import 'package:gofield/core/router/app_routes.dart';
 
 class UserHomePage extends StatelessWidget {
   const UserHomePage({super.key});
@@ -9,7 +10,7 @@ class UserHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MainUserScaffold(
       showNavBar: true, 
-      child: HomeContent(),
+      child: HomeContent()
     );
   }
 }
@@ -46,11 +47,12 @@ class HomeContent extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
+                    padding: EdgeInsets.symmetric(horizontal: 0),
                     width: double.maxFinite,
                     margin: const EdgeInsets.all(12),
                     child: AspectRatio(
@@ -103,56 +105,48 @@ class HomeContent extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  const Text(
-                    'Kategori Olahraga',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: const Text(
+                      'Kategori Olahraga',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
-                  SizedBox(
-                    height: 100,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _buildCategoryCard(
-                          'Futsal',
-                          Icons.sports_soccer,
-                          Colors.green,
-                        ),
-                        _buildCategoryCard(
-                          'Badminton',
-                          Icons.sports_tennis,
-                          Colors.blue,
-                        ),
-                        _buildCategoryCard(
-                          'Basket',
-                          Icons.sports_basketball,
-                          Colors.orange,
-                        ),
-                        _buildCategoryCard(
-                          'Voli',
-                          Icons.sports_volleyball,
-                          Colors.red,
-                        ),
-                        _buildCategoryCard(
-                          'Tenis',
-                          Icons.sports_tennis,
-                          Colors.purple,
-                        ),
-                      ],
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 0),
+                    child: SizedBox(
+                      height: 80,
+                      width: double.infinity,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          _buildCategoryCard(context, 'Futsal', Icons.sports_soccer, Colors.green),
+                          _buildCategoryCard(context, 'Badminton', Icons.sports_tennis, Colors.blue),
+                          _buildCategoryCard(context, 'Basket', Icons.sports_basketball, Colors.orange),
+                          _buildCategoryCard(context, 'Voli', Icons.sports_volleyball, Colors.red),
+                          _buildCategoryCard(context, 'Tenis', Icons.sports_tennis, Colors.purple),
+                        ],
+                      ),
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 34),
 
-                  const Text(
-                    'Lapangan Populer',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: const Text(
+                      'Lapangan Populer',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
 
                   Container(
-                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 18),
+                    width: double.maxFinite,
+                    margin: const EdgeInsets.all(12),
                     height: 200,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
@@ -167,7 +161,63 @@ class HomeContent extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: const Column(
+                    child: const Column(  
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.sports_soccer_outlined,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Lapangan Populer',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          'Akan segera hadir',
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),  
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 18),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Text(
+                      'Dapatkan Promo',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 18),
+                    width: double.maxFinite,
+                    margin: const EdgeInsets.all(12),
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade200),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Column(  
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
@@ -191,6 +241,7 @@ class HomeContent extends StatelessWidget {
                       ],
                     ),
                   ),
+                  
                 ],
               ),
             ),
@@ -200,36 +251,37 @@ class HomeContent extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(String title, IconData icon, Color color) {
-    return Container(
-      width: 80,
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
+  Widget _buildCategoryCard(BuildContext context, String title, IconData icon, Color color) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          // Navigator.pushNamed(context, AppRoutes.userListPage);
+        },
+        child: Container(
+          width: 80,
+          margin: const EdgeInsets.only(right: 18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 2,
+                offset: const Offset(0, 1),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(50),
-            ),
-            child: Icon(icon, size: 24, color: color),
-          ),          
-        ],
-      ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 36, color: color,)
+            ],
+          ),
+        ),
+      )
     );
   }
 }
