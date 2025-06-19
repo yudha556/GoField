@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/app/views/user/components/header.dart';
-// import 'package:gofield/core/router/app_routes.dart';
+import 'package:gofield/core/router/app_routes.dart';
 
 class UserHomePage extends StatelessWidget {
   const UserHomePage({super.key});
@@ -256,7 +257,7 @@ class HomeContent extends StatelessWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          // Navigator.pushNamed(context, AppRoutes.userListPage);
+           context.go(AppRoutes.userListPage);
         },
         child: Container(
           width: 60,

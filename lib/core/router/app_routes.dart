@@ -21,5 +21,5 @@ class AppRoutes {
   static const String userprofilePage = '/user/profile';
   static const String userpromoPage = '/user/promo';
   static const String userhomePage = '/user/home';
-  // static const String userListPage = '/components/list';
+  static const String userListPage = '/home/list';
 }
