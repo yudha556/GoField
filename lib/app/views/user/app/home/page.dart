@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/app/views/user/components/header.dart';
 import 'package:gofield/core/router/app_routes.dart';
@@ -47,57 +48,58 @@ class HomeContent extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 0),
-                    width: double.maxFinite,
-                    margin: const EdgeInsets.all(12),
-                    child: AspectRatio(
-                      aspectRatio: 19 / 6, 
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.blue.shade400, Colors.blue.shade600],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    child: Container(
+                      height: 120,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue.shade400, Colors.blue.shade600],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Promo Spesial!',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Promo Spesial!',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
-                              SizedBox(height: 8),
-                              Text(
+                            ),
+                            SizedBox(height: 6),
+                            Flexible(
+                              child: Text(
                                 'Dapatkan diskon 50% untuk booking pertama',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   color: Colors.white70,
                                 ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -115,20 +117,18 @@ class HomeContent extends StatelessWidget {
                   const SizedBox(height: 10),
 
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 0),
-                    child: SizedBox(
-                      height: 80,
-                      width: double.infinity,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: [
-                          _buildCategoryCard(context, 'Futsal', Icons.sports_soccer, Colors.green),
-                          _buildCategoryCard(context, 'Badminton', Icons.sports_tennis, Colors.blue),
-                          _buildCategoryCard(context, 'Basket', Icons.sports_basketball, Colors.orange),
-                          _buildCategoryCard(context, 'Voli', Icons.sports_volleyball, Colors.red),
-                          _buildCategoryCard(context, 'Tenis', Icons.sports_tennis, Colors.purple),
-                        ],
-                      ),
+                    height: 60,
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 18),
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        _buildCategoryCard(context, 'Futsal', Icons.sports_soccer, Colors.green),
+                        _buildCategoryCard(context, 'Badminton', Icons.sports_tennis, Colors.blue),
+                        _buildCategoryCard(context, 'Basket', Icons.sports_basketball, Colors.orange),
+                        _buildCategoryCard(context, 'Voli', Icons.sports_volleyball, Colors.red),
+                        _buildCategoryCard(context, 'Tenis', Icons.sports_tennis, Colors.purple),
+                      ],
                     ),
                   ),
 
@@ -144,9 +144,9 @@ class HomeContent extends StatelessWidget {
                   const SizedBox(height: 10),
 
                   Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     padding: EdgeInsets.symmetric(horizontal: 18),
-                    width: double.maxFinite,
-                    margin: const EdgeInsets.all(12),
                     height: 200,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
@@ -200,9 +200,9 @@ class HomeContent extends StatelessWidget {
                   SizedBox(height: 10),
 
                   Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                     padding: EdgeInsets.symmetric(horizontal: 18),
-                    width: double.maxFinite,
-                    margin: const EdgeInsets.all(12),
                     height: 200,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade50,
@@ -256,23 +256,15 @@ class HomeContent extends StatelessWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
-          // Navigator.pushNamed(context, AppRoutes.userListPage);
+           context.go(AppRoutes.userListPage);
         },
         child: Container(
-          width: 80,
-          margin: const EdgeInsets.only(right: 18),
+          width: 60,
+          margin: const EdgeInsets.only(right: 12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(50),
             border: Border.all(color: Colors.grey.shade200),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -15,26 +15,29 @@ class SearchBarComponent extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12), // Kurangi dari 16 ke 12
         height: 40,
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(50),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              hintText ?? 'Search...',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 16,
+          children: [ // Hapus mainAxisAlignment: spaceBetween
+            Expanded( // Wrap Text dengan Expanded
+              child: Text(
+                hintText ?? 'Search...',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14, // Kurangi dari 16 ke 14
+                ),
+                overflow: TextOverflow.ellipsis, // Tambah overflow handling
               ),
             ),
-            Spacer(),
+            SizedBox(width: 8), // Tambah spacing tetap
             Icon(
               Icons.search,
               color: Colors.grey[600],
+              size: 20, // Kurangi ukuran icon
             ),
           ],
         ),

@@ -114,15 +114,16 @@ class AppRouter {
           return const UserProfile.ProfilePage();
         },
       ),
-      // GoRoute(
-      //   path: AppRoutes.userListPage,
-      //   name: 'List Id',
-      //   builder: (context, state) {
-      //     print('Builder List Page');
-      //     return const userListPage.ListPage();
-      //   },
-      // ),
+      GoRoute(
+        path: AppRoutes.userListPage,
+        name: 'List Id',
+        builder: (context, state) {
+          print('Builder List Page');
+          return const userListPage.ListPage();
+        },
+      ),
     ],
+    
 
     errorBuilder: (context, state) {
       print('Router Error: ${state.error}');
