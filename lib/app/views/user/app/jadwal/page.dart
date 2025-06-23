@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:gofield/app/views/user/app/home/page.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 
 class JadwalPage extends StatelessWidget {
