@@ -22,4 +22,5 @@ class AppRoutes {
   static const String userpromoPage = '/user/promo';
   static const String userhomePage = '/user/home';
   static const String userListPage = '/home/list';
+  static const String userTransactionDetail = '/transaksi/id';
 }
