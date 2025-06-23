@@ -68,7 +68,7 @@ class MainUserScaffold extends StatelessWidget {
           label: 'Jadwal',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.receipt_outlined),
+          icon: Icon(Icons.event_note_outlined),
           label: 'Transaksi',
         ),
         BottomNavigationBarItem(

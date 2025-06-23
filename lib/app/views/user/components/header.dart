@@ -50,7 +50,7 @@ class HeaderBar extends StatelessWidget {
             ),
           ],
         ),
-        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         child: Row(
           children: [
             // Notification Button

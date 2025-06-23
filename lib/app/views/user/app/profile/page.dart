@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/core/components/buttons/button.dart';
+import 'package:gofield/core/router/app_routes.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MainUserScaffold(showNavBar: true, child: ProfileContent());
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Color(0xFF0088E8),
+        statusBarIconBrightness: Brightness.dark, 
+        statusBarBrightness: Brightness.light, // IOS
+      ),
+      child: const MainUserScaffold(
+        showNavBar: true,
+        child: SafeArea(
+          child: ProfileContent(),
+        ),
+      ),
+    );
   }
 }
 
@@ -313,7 +328,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.wallet_giftcard_outlined, size: 20),
+                              Icon(Icons.wallet_outlined, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 'Metode Pembayaran',
@@ -336,7 +351,7 @@ class _ProfileContentState extends State<ProfileContent> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, '/payment-methods');
+                    context.go(AppRoutes.usertransaksiPage);
                   },
                   child: Container(
                     child: Padding(
@@ -350,7 +365,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.note_add_outlined, size: 20),
+                              Icon(Icons.event_note_outlined, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 'Riwayat Reservasi',
@@ -387,7 +402,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.hearing_outlined, size: 20),
+                              Icon(Icons.heart_broken, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 'Lapangan favorit',
@@ -452,7 +467,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.message_outlined, size: 20),
+                              Icon(Icons.contact_support_outlined, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 'FAQ',
@@ -491,7 +506,7 @@ class _ProfileContentState extends State<ProfileContent> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.call_outlined, size: 20),
+                                  Icon(Icons.support_agent_outlined, size: 20),
                                   SizedBox(width: 8),
                                   Text(
                                     'Customer Service',
