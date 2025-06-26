@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -26,37 +27,77 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
+        _errorMessage = null;
       });
 
-      // Simulasi login process
-      Future.delayed(const Duration(seconds: 1), () {
+      try {
+        final result = await useAuthLogin(
+          context,
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
+
+        if (!result.success) {
+          setState(() {
+            _errorMessage = result.message;
+          });
+
+          // Show resend verification option if needed
+          if (result.needsEmailVerification) {
+            _showResendVerificationDialog();
+          }
+        }
+      } catch (e) {
         setState(() {
-          _isLoading = false;
+          _errorMessage = 'Terjadi kesalahan yang tidak terduga. Silakan coba lagi.';
         });
-
-        // Determine role based on email or you can implement your own logic
-        String role = _determineUserRole(_emailController.text);
-        
-        // Call the login hook to navigate to appropriate page
-        useLoginHook(context, role);
-      });
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     }
   }
 
-  String _determineUserRole(String email) {
-    // Simple role determination based on email
-    // You can replace this with actual authentication logic
-    if (email.toLowerCase().contains('admin')) {
-      return 'admin';
-    } else if (email.toLowerCase().contains('owner')) {
-      return 'owner';
-    } else {
-      return 'user';
-    }
+  void _showResendVerificationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Email Belum Diverifikasi'),
+        content: const Text('Akun Anda belum diverifikasi. Kirim ulang email verifikasi?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              final success = await useResendEmailConfirmation(_emailController.text.trim());
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success 
+                        ? 'Email verifikasi telah dikirim ulang'
+                        : 'Gagal mengirim email verifikasi'
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Kirim Ulang'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -90,6 +131,27 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 20.0),
 
+                // Error message
+                if (_errorMessage != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: Colors.red[50],
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: Colors.red[200]!),
+                    ),
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 14,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                ],
+
                 // Email form field
                 TextFormField(
                   controller: _emailController,
@@ -108,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (value == null || value.isEmpty) {
                       return 'Email tidak boleh kosong';
                     }
-                    if (!value.contains('@')) {
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
                       return 'Format email tidak valid';
                     }
                     return null;
@@ -161,7 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                     text: 'Lupa Password?',
                     size: ButtonSize.small,
                     onPressed: () {
-                      print('Forgot password pressed');
+                      _showForgotPasswordDialog();
                     },
                   ),
                 ),
@@ -194,9 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                 // Google icon button 
                 Center(
                   child: InkWell(
-                    onTap: () {
-                      print('Login with Google (icon only) pressed!');
-                    },
+                    onTap: _isLoading ? null : _handleGoogleLogin,
                     borderRadius: BorderRadius.circular(28.0),
                     child: Container(
                       width: 56.0,
@@ -215,11 +275,13 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       padding: const EdgeInsets.all(16.0),
-                      child: SvgPicture.asset(
-                        'assets/icons/icons-google.svg',
-                        height: 24.0,
-                        width: 24.0,
-                      ),
+                      child: _isLoading 
+                        ? const CircularProgressIndicator(strokeWidth: 2)
+                        : SvgPicture.asset(
+                            'assets/icons/icons-google.svg',
+                            height: 24.0,
+                            width: 24.0,
+                          ),
                     ),
                   ),
                 ),
@@ -243,32 +305,63 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-
-                // Development helper text
-                const SizedBox(height: 20.0),
-                Container(
-                  padding: const EdgeInsets.all(12.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.blue[200]!),
-                  ),
-                  child: const Text(
-                    'Development Mode:\n'
-                    '• Email dengan "admin" → Admin Dashboard\n'
-                    '• Email dengan "owner" → Owner Dashboard\n'
-                    '• Email lainnya → User Dashboard',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  void _showForgotPasswordDialog() {
+    final emailController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Masukkan email Anda untuk reset password:'),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () async {
+              if (emailController.text.trim().isNotEmpty) {
+                Navigator.of(context).pop();
+                final success = await useAuthResetPassword(emailController.text.trim());
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success 
+                          ? 'Link reset password telah dikirim ke email Anda'
+                          : 'Gagal mengirim link reset password'
+                      ),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Kirim'),
+          ),
+        ],
       ),
     );
   }
