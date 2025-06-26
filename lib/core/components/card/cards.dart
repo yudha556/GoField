@@ -9,14 +9,14 @@ class GlobalCard extends StatelessWidget {
   final bool isResponsive;
 
   const GlobalCard({
-    Key? key,
+    super.key,
     required this.child,
     this.padding,
     this.backgroundColor,
     this.elevation,
     this.borderRadius,
     this.isResponsive = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,14 +46,14 @@ class GlobalCardGrid extends StatelessWidget {
   final double? childAspectRatio;
 
   const GlobalCardGrid({
-    Key? key,
+    super.key,
     required this.children,
     this.crossAxisCount = 2,
     this.spacing = 16,
     this.runSpacing = 16,
     this.padding,
     this.childAspectRatio,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

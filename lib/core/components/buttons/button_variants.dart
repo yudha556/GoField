@@ -12,7 +12,7 @@ class PrimaryButton extends StatelessWidget {
   final bool iconRight;
 
   const PrimaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.size = ButtonSize.medium,
@@ -20,7 +20,7 @@ class PrimaryButton extends StatelessWidget {
     this.isFullWidth = false,
     this.icon,
     this.iconRight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +48,7 @@ class CancelButton extends StatelessWidget {
   final bool iconRight;
 
   const CancelButton({
-    Key? key,
+    super.key,
     this.text = 'Batal',
     this.onPressed,
     this.size = ButtonSize.medium,
@@ -56,7 +56,7 @@ class CancelButton extends StatelessWidget {
     this.isFullWidth = false,
     this.icon,
     this.iconRight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +84,7 @@ class SecondaryButton extends StatelessWidget {
   final bool iconRight;
 
   const SecondaryButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.size = ButtonSize.medium,
@@ -92,7 +92,7 @@ class SecondaryButton extends StatelessWidget {
     this.isFullWidth = false,
     this.icon,
     this.iconRight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +120,7 @@ class OutlineButton extends StatelessWidget {
   final bool iconRight;
 
   const OutlineButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.size = ButtonSize.medium,
@@ -128,7 +128,7 @@ class OutlineButton extends StatelessWidget {
     this.isFullWidth = false,
     this.icon,
     this.iconRight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +156,7 @@ class DeleteButton extends StatelessWidget {
   final bool iconRight;
 
   const DeleteButton({
-    Key? key,
+    super.key,
     this.text = 'Hapus',
     this.onPressed,
     this.size = ButtonSize.medium,
@@ -164,7 +164,7 @@ class DeleteButton extends StatelessWidget {
     this.isFullWidth = false,
     this.icon = Icons.delete,
     this.iconRight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -191,14 +191,14 @@ class LinkButton extends StatelessWidget {
   final bool iconRight;
 
   const LinkButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.size = ButtonSize.medium,
     this.isLoading = false,
     this.icon,
     this.iconRight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
