@@ -67,7 +67,7 @@ flutter:
   assets:
     - .env.local
     - assets/icons/
-    # - assets/images/ ini ntar buka aja misal ada yang dibutuhkan pake img
+    - assets/images/ 
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -35,24 +35,24 @@ class HomeContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            HeaderBar(
-              searchHint: 'Cari lapangan olahraga...',
-              notificationCount: 3,
-              cartItemCount: 2,
-              profileImageUrl: null,
-              onSearchTap: () {
-                print('Search tapped');
-              },
-              onNotificationTap: () {
-                print('Notification tapped');
-              },
-              onCartTap: () {
-                print('Cart tapped');
-              },
-              onProfileTap: () {
-                print('Profile tapped');
-              },
-            ),
+            // HeaderBar(
+            //   searchHint: 'Cari lapangan olahraga...',
+            //   notificationCount: 3,
+            //   cartItemCount: 2,
+            //   profileImageUrl: null,
+            //   onSearchTap: () {
+            //     print('Search tapped');
+            //   },
+            //   onNotificationTap: () {
+            //     print('Notification tapped');
+            //   },
+            //   onCartTap: () {
+            //     print('Cart tapped');
+            //   },
+            //   onProfileTap: () {
+            //     print('Profile tapped');
+            //   },
+            // ),
 
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 2),

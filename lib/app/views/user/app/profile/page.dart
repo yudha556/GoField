@@ -402,7 +402,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.heart_broken, size: 20),
+                              Icon(Icons.favorite, size: 20,),
                               SizedBox(width: 8),
                               Text(
                                 'Lapangan favorit',

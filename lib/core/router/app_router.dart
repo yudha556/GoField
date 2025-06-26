@@ -8,7 +8,7 @@ import 'package:gofield/app/views/auth/register/components/otpVerify.dart';
 import 'package:gofield/app/views/admin/app/home/page.dart' as AdminHome;
 import 'package:gofield/app/views/owner/app/home/page.dart' as OwnerHome;
 import 'package:gofield/app/views/user/app/home/page.dart' as UserHome;
-import 'package:gofield/app/views/user/app/jadwal/page.dart' as UserJadwal;
+import 'package:gofield/app/views/user/app/search/page.dart' as UserSearchPage;
 import 'package:gofield/app/views/user/app/profile/page.dart' as UserProfile;
 import 'package:gofield/app/views/user/app/promo/page.dart' as UserPromo;
 import 'package:gofield/app/views/user/app/transaksi/page.dart'
@@ -87,11 +87,11 @@ class AppRouter {
 
       // user page
       GoRoute(
-        path: AppRoutes.userjadwalPage,
+        path: AppRoutes.userSearchPage,
         name: 'JadwalPage',
         builder: (context, state) {
           print('Router: Building User Page');
-          return const UserJadwal.JadwalPage();
+          return const UserSearchPage.SearchPage();
         },
       ),
       GoRoute(
