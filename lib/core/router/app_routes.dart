@@ -16,7 +16,7 @@ class AppRoutes {
   static const String userDashboard = '/user/home';
 
   // user page
-  static const String userjadwalPage = '/user/jadwal';
+  static const String userSearchPage = '/user/jadwal';
   static const String usertransaksiPage = '/user/transaksi';
   static const String userprofilePage = '/user/profile';
   static const String userpromoPage = '/user/promo';

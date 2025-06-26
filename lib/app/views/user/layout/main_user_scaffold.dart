@@ -64,8 +64,8 @@ class MainUserScaffold extends StatelessWidget {
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.schedule_outlined),
-          label: 'Jadwal',
+          icon: Icon(Icons.search_rounded),
+          label: 'Cari',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.event_note_outlined),
@@ -98,7 +98,7 @@ class MainUserScaffold extends StatelessWidget {
         context.go(AppRoutes.userhomePage);
         break;
       case 1:
-        context.go(AppRoutes.userjadwalPage);
+        context.go(AppRoutes.userSearchPage);
         break;
       case 2:
         context.go(AppRoutes.usertransaksiPage);

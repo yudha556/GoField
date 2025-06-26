@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 
-class JadwalPage extends StatelessWidget {
-  const JadwalPage({super.key});
+class SearchPage extends StatelessWidget {
+  const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,20 +13,20 @@ class JadwalPage extends StatelessWidget {
         statusBarIconBrightness: Brightness.dark, 
         statusBarBrightness: Brightness.light, // IOS
       ),
-      child: const MainUserScaffold(child: SafeArea(child: JadwalContent()))
+      child: const MainUserScaffold(child: SafeArea(child: SearchContent()))
     );
   }
 }
 
-class JadwalContent extends StatelessWidget {
-  const JadwalContent({super.key});
+class SearchContent extends StatelessWidget {
+  const SearchContent({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          Text('ini halaman jadwal')
+          Text('ini halaman search')
         ],
       ),
     );
