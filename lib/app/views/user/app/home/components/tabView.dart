@@ -5,9 +5,9 @@ class TabViewHome extends StatefulWidget {
   final Function(int) onTabChanged;
   
   const TabViewHome({
-    Key? key,
+    super.key,
     required this.onTabChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<TabViewHome> createState() => _TabViewHomeState();

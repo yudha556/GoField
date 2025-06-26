@@ -27,7 +27,7 @@ class CustomButton extends StatelessWidget {
   final double? customHeight;
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
     this.onPressed,
     this.type = ButtonType.primary,
@@ -38,7 +38,7 @@ class CustomButton extends StatelessWidget {
     this.iconRight = false,
     this.customWidth,
     this.customHeight,
-  }) : super(key: key);
+  });
 
   // Warna konsisten untuk app
   static const Color primaryBlue = Color(0xFF2196F3);
