@@ -1,34 +1,40 @@
 class PenggunaModel {
-  final String idPengguna; // UUID from auth.users.id
+  final String idPengguna;
   final String namaLengkap;
-  final String email;
-  final String? nomorTelepon;
+  final String userEmail; // Now included
+  final String nomorTelepon;
   final String? alamat;
   final PeranEnum peran;
   final DateTime tanggalDaftar;
   final bool aktif;
+  final String? imageUrl;
 
   PenggunaModel({
     required this.idPengguna,
     required this.namaLengkap,
-    required this.email,
-    this.nomorTelepon,
+    required this.userEmail,
+    required this.nomorTelepon,
     this.alamat,
     required this.peran,
     required this.tanggalDaftar,
     required this.aktif,
+    this.imageUrl,
   });
 
   factory PenggunaModel.fromJson(Map<String, dynamic> json) {
     return PenggunaModel(
-      idPengguna: json['id_pengguna'] as String,
-      namaLengkap: json['nama_lengkap'] as String,
-      email: json['email'] as String,
-      nomorTelepon: json['nomor_telepon'] as String?,
-      alamat: json['alamat'] as String?,
-      peran: PeranEnum.fromString(json['peran'] as String),
-      tanggalDaftar: DateTime.parse(json['tanggal_daftar'] as String),
-      aktif: json['aktif'] as bool? ?? true,
+      idPengguna: json['id_pengguna'],
+      namaLengkap: json['nama_lengkap'],
+      userEmail: json['user_email'],
+      nomorTelepon: json['nomor_telepon'],
+      alamat: json['alamat'],
+      peran: PeranEnum.values.firstWhere(
+        (e) => e.name == json['peran'],
+        orElse: () => PeranEnum.pengguna,
+      ),
+      tanggalDaftar: DateTime.parse(json['tanggal_daftar']),
+      aktif: json['aktif'] ?? true,
+      imageUrl: json['image_url'],
     );
   }
 
@@ -36,12 +42,13 @@ class PenggunaModel {
     return {
       'id_pengguna': idPengguna,
       'nama_lengkap': namaLengkap,
-      'email': email,
+      'user_email': userEmail,
       'nomor_telepon': nomorTelepon,
       'alamat': alamat,
-      'peran': peran.value,
+      'peran': peran.name,
       'tanggal_daftar': tanggalDaftar.toIso8601String(),
       'aktif': aktif,
+      'image_url': imageUrl,
     };
   }
 
@@ -49,7 +56,7 @@ class PenggunaModel {
     return {
       'id_pengguna': idPengguna,
       'nama_lengkap': namaLengkap,
-      'email': email,
+      'user_email': userEmail,
       'nomor_telepon': nomorTelepon,
       'alamat': alamat,
       'peran': peran.value,
@@ -70,7 +77,7 @@ class PenggunaModel {
     return PenggunaModel(
       idPengguna: idPengguna ?? this.idPengguna,
       namaLengkap: namaLengkap ?? this.namaLengkap,
-      email: email ?? this.email,
+      userEmail: email ?? this.userEmail,
       nomorTelepon: nomorTelepon ?? this.nomorTelepon,
       alamat: alamat ?? this.alamat,
       peran: peran ?? this.peran,

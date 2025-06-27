@@ -1,188 +1,118 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/components/components.dart';
+import 'package:gofield/core/services/auth_service/auth_service.dart';
 
-class VerifyPage extends StatefulWidget {
+class VerifyPage extends StatelessWidget {
   const VerifyPage({super.key});
-
-  @override
-  State<VerifyPage> createState() => _VerifyPageState();
-}
-
-class _VerifyPageState extends State<VerifyPage> {
-  static const int otpLength = 4;
-  static const int resendDuration = 60;
-
-  final List<TextEditingController> _otpControllers = List.generate(
-    otpLength,
-    (index) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(
-    otpLength,
-    (index) => FocusNode(),
-  );
-
-  bool _isLoading = false;
-  bool _canResend = true;
-  int _resendCountdown = 0;
-
-  @override
-  void dispose() {
-    for (var controller in _otpControllers) {
-      controller.dispose();
-    }
-    for (var focusNode in _focusNodes) {
-      focusNode.dispose();
-    }
-    super.dispose();
-  }
-
-  String get _otpCode => _otpControllers.map((controller) => controller.text).join();
-  bool get _isOTPComplete => _otpCode.length == otpLength;
-
-  void _startResendCountdown() {
-    setState(() {
-      _canResend = false;
-      _resendCountdown = resendDuration;
-    });
-
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 1));
-      if (mounted) {
-        setState(() => _resendCountdown--);
-        return _resendCountdown > 0;
-      }
-      return false;
-    }).then((_) {
-      if (mounted) {
-        setState(() => _canResend = true);
-      }
-    });
-  }
-
-  Future<void> _handleVerification() async {
-    setState(() => _isLoading = true);
-    
-    try {
-      await Future.delayed(const Duration(seconds: 2));
-      // TODO: Implement actual verification logic
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
-  }
-
-  void _handleOTPFieldChange(String value, int index) {
-    setState(() {});
-    
-    if (value.length == 1 && index < otpLength - 1) {
-      _focusNodes[index + 1].requestFocus();
-    } else if (value.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
-    } else if (index == otpLength - 1) {
-      _focusNodes[index].unfocus();
-    }
-  }
-
-  Widget _buildOTPField(int index) {
-    return SizedBox(
-      width: 50,
-      child: TextFormField(
-        controller: _otpControllers[index],
-        focusNode: _focusNodes[index],
-        textAlign: TextAlign.center,
-        keyboardType: TextInputType.number,
-        maxLength: 1,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-        decoration: InputDecoration(
-          counterText: "",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.grey[300]!),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: const BorderSide(color: Colors.blue, width: 2.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: BorderSide(color: Colors.grey[300]!),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: const BorderSide(color: Colors.red, width: 2.0),
-          ),
-          filled: true,
-          fillColor: Colors.grey[50],
-        ),
-        onChanged: (value) => _handleOTPFieldChange(value, index),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const Text(
-                'Verifikasi',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        title: const Text(
+          'Verifikasi Email',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => context.pop(),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Email icon
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.email_outlined,
+                size: 50,
+                color: Colors.blue,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Title
+            const Text(
+              'Cek Email Anda',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+
+            // Description
+            const Text(
+              'Kami telah mengirimkan link verifikasi ke email Anda. Silakan cek inbox atau folder spam untuk mengaktifkan akun.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+
+            // Resend button
+            OutlinedButton(
+              onPressed: () async {
+                // You can implement resend logic here
+                // For now, just show a message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Fitur kirim ulang akan segera tersedia'),
+                  ),
+                );
+              },
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              const SizedBox(height: 15.0),
-              const Text(
-                'Masukan kode yang anda terima di email',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
+              child: const Text('Kirim Ulang Email'),
+            ),
+            const SizedBox(height: 16),
+
+            // Login button
+            PrimaryButton(
+              text: 'Kembali ke Login',
+              isFullWidth: true,
+              onPressed: () {
+                context.go(AppRoutes.login);
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // Info text
+            Text(
+              'Setelah verifikasi email, Anda dapat login dengan akun yang telah dibuat.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
               ),
-              const SizedBox(height: 23.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(otpLength, _buildOTPField),
-              ),
-              const SizedBox(height: 20.0),
-              Center(
-                child: _canResend
-                    ? LinkButton(
-                        text: 'Tidak menerima OTP?',
-                        size: ButtonSize.small,
-                        onPressed: _startResendCountdown,
-                      )
-                    : Text(
-                        'Kirim ulang dalam $_resendCountdown detik',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-              ),
-              const SizedBox(height: 10.0),
-              PrimaryButton(
-                text: 'Verifikasi',
-                isFullWidth: true,
-                isLoading: _isLoading,
-                onPressed: _isOTPComplete && !_isLoading ? _handleVerification : null,
-              ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/components/components.dart';
 import 'package:gofield/app/views/auth/hooks/login.hooks.dart';
+import 'package:gofield/core/models/pengguna_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,7 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
-  String? _errorMessage;
 
   @override
   void dispose() {
@@ -31,7 +31,6 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
-        _errorMessage = null;
       });
 
       try {
@@ -41,63 +40,27 @@ class _LoginPageState extends State<LoginPage> {
           _passwordController.text,
         );
 
-        if (!result.success) {
-          setState(() {
-            _errorMessage = result.message;
-          });
-
-          // Show resend verification option if needed
-          if (result.needsEmailVerification) {
-            _showResendVerificationDialog();
-          }
-        }
-      } catch (e) {
-        setState(() {
-          _errorMessage = 'Terjadi kesalahan yang tidak terduga. Silakan coba lagi.';
-        });
-      } finally {
         if (mounted) {
           setState(() {
             _isLoading = false;
           });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result.message)),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Terjadi kesalahan saat login')),
+          );
         }
       }
     }
-  }
-
-  void _showResendVerificationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Email Belum Diverifikasi'),
-        content: const Text('Akun Anda belum diverifikasi. Kirim ulang email verifikasi?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              final success = await useResendEmailConfirmation(_emailController.text.trim());
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      success 
-                        ? 'Email verifikasi telah dikirim ulang'
-                        : 'Gagal mengirim email verifikasi'
-                    ),
-                    backgroundColor: success ? Colors.green : Colors.red,
-                  ),
-                );
-              }
-            },
-            child: const Text('Kirim Ulang'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -131,28 +94,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 20.0),
 
-                // Error message
-                if (_errorMessage != null) ...[
-                  Container(
-                    padding: const EdgeInsets.all(12.0),
-                    decoration: BoxDecoration(
-                      color: Colors.red[50],
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(color: Colors.red[200]!),
-                    ),
-                    child: Text(
-                      _errorMessage!,
-                      style: const TextStyle(
-                        color: Colors.red,
-                        fontSize: 14,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                ],
-
-                // Email form field
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -170,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (value == null || value.isEmpty) {
                       return 'Email tidak boleh kosong';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!value.contains('@')) {
                       return 'Format email tidak valid';
                     }
                     return null;
@@ -178,7 +119,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 10.0),
 
-                // Password form field
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
@@ -190,9 +130,9 @@ class _LoginPageState extends State<LoginPage> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible 
-                          ? Icons.visibility 
-                          : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -216,24 +156,36 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 5.0),
 
-                // Forgot password button 
                 Align(
                   alignment: Alignment.centerRight,
                   child: LinkButton(
                     text: 'Lupa Password?',
                     size: ButtonSize.small,
-                    onPressed: () {
-                      _showForgotPasswordDialog();
+                    onPressed: () async {
+                      final email = _emailController.text.trim();
+                      if (email.isNotEmpty) {
+                        final success = await useAuthResetPassword(email);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Link reset password telah dikirim ke email Anda'
+                                    : 'Gagal mengirim link reset password',
+                              ),
+                            ),
+                          );
+                        }
+                      }
                     },
                   ),
                 ),
                 const SizedBox(height: 20.0),
 
-                // Login button 
                 PrimaryButton(
-                  text: _isLoading ? 'Loading...' : 'Login',
-                  size: ButtonSize.medium,
+                  text: 'Login',
                   isFullWidth: true,
+                  isLoading: _isLoading,
                   onPressed: _isLoading ? null : _handleLogin,
                 ),
                 const SizedBox(height: 24.0),
@@ -253,17 +205,35 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 20.0),
 
-                // Google icon button 
                 Center(
                   child: InkWell(
-                    onTap: _isLoading ? null : _handleGoogleLogin,
+                    onTap: () async {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      
+                      final result = await useGoogleSignIn(context);
+                      
+                      if (mounted) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result.message)),
+                        );
+                      }
+                    },
                     borderRadius: BorderRadius.circular(28.0),
                     child: Container(
                       width: 56.0,
                       height: 56.0,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey[300]!, width: 1.5),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          width: 1.5,
+                        ),
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
@@ -275,19 +245,16 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       padding: const EdgeInsets.all(16.0),
-                      child: _isLoading 
-                        ? const CircularProgressIndicator(strokeWidth: 2)
-                        : SvgPicture.asset(
-                            'assets/icons/icons-google.svg',
-                            height: 24.0,
-                            width: 24.0,
-                          ),
+                      child: SvgPicture.asset(
+                        'assets/icons/icons-google.svg',
+                        height: 24.0,
+                        width: 24.0,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 30.0),
 
-                // Register button 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -300,7 +267,6 @@ class _LoginPageState extends State<LoginPage> {
                       size: ButtonSize.small,
                       onPressed: () {
                         context.go(AppRoutes.register);
-                        print('Register button pressed');
                       },
                     ),
                   ],
@@ -309,59 +275,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  void _showForgotPasswordDialog() {
-    final emailController = TextEditingController();
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset Password'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Masukkan email Anda untuk reset password:'),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.emailAddress,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () async {
-              if (emailController.text.trim().isNotEmpty) {
-                Navigator.of(context).pop();
-                final success = await useAuthResetPassword(emailController.text.trim());
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success 
-                          ? 'Link reset password telah dikirim ke email Anda'
-                          : 'Gagal mengirim link reset password'
-                      ),
-                      backgroundColor: success ? Colors.green : Colors.red,
-                    ),
-                  );
-                }
-              }
-            },
-            child: const Text('Kirim'),
-          ),
-        ],
       ),
     );
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
-import 'package:gofield/core/models/auth_result.dart';
 import 'package:gofield/core/models/pengguna_model.dart';
 import 'package:gofield/core/services/auth_service/auth_service.dart';
-import 'package:gofield/core/services/auth_service/google_auth_service.dart';
+import 'dart:developer' as developer; // Replace print with developer.log
 
+// Navigation hook based on user role
 void useLoginHook(BuildContext context, PeranEnum role) {
   String routePath;
 
@@ -16,28 +16,42 @@ void useLoginHook(BuildContext context, PeranEnum role) {
     case PeranEnum.pemilik:
       routePath = AppRoutes.ownerDashboard;
       break;
-    default:
+    case PeranEnum.pengguna:
       routePath = AppRoutes.userDashboard;
+      break;
+    // Remove default case since all cases are covered
   }
 
-  context.go(routePath);
+  if (context.mounted) {
+    context.go(routePath);
+  }
 }
 
 // Hook untuk handle login dengan Supabase
 Future<AuthResult> useAuthLogin(BuildContext context, String email, String password) async {
   try {
-    final result = await AuthService.signInWithEmailPassword(email, password);
+    final result = await AuthService.signInWithEmailPassword(
+      email: email,
+      password: password,
+    );
     
-    if (result.success && result.peran != null) {
-      useLoginHook(context, result.peran!);
+    if (result.success && result.user != null) {
+      // Get user profile to determine role
+      final userProfile = await AuthService.getCurrentPengguna();
+      if (userProfile != null && context.mounted) {
+        useLoginHook(context, userProfile.peran);
+      } else if (context.mounted) {
+        // Default to user dashboard if profile not found
+        context.go(AppRoutes.userDashboard);
+      }
     }
     
     return result;
   } catch (e) {
-    print('Auth login hook error: $e');
+    developer.log('Auth login hook error: $e', name: 'AuthHooks');
     return AuthResult(
       success: false,
-      message: 'Terjadi kesalahan saat login.',
+      message: 'Terjadi kesalahan saat login: ${e.toString()}',
     );
   }
 }
@@ -57,35 +71,15 @@ Future<AuthResult> useAuthRegister(BuildContext context, {
       password: password,
       namaLengkap: namaLengkap,
       nomorTelepon: nomorTelepon,
-      alamat: alamat,
       peran: peran,
     );
     
     return result;
   } catch (e) {
-    print('Auth register hook error: $e');
+    developer.log('Auth register hook error: $e', name: 'AuthHooks');
     return AuthResult(
       success: false,
-      message: 'Terjadi kesalahan saat mendaftar.',
-    );
-  }
-}
-
-// Google Sign In hook
-Future<GoogleSignInResult> useGoogleSignIn(BuildContext context, {bool isRegister = false}) async {
-  try {
-    final result = await GoogleAuthService.signInWithGoogle(isRegister: isRegister);
-    
-    if (result.success && result.peran != null) {
-      useLoginHook(context, result.peran!);
-    }
-    
-    return result;
-  } catch (e) {
-    print('Google Sign In hook error: $e');
-    return GoogleSignInResult(
-      success: false,
-      message: 'Terjadi kesalahan saat login dengan Google.',
+      message: 'Terjadi kesalahan saat mendaftar: ${e.toString()}',
     );
   }
 }
@@ -93,20 +87,13 @@ Future<GoogleSignInResult> useGoogleSignIn(BuildContext context, {bool isRegiste
 // Hook untuk logout
 Future<void> useAuthLogout(BuildContext context) async {
   try {
-    // Sign out from Google if signed in
-    if (await GoogleAuthService.isSignedInWithGoogle()) {
-      await GoogleAuthService.signOutGoogle();
-    }
-    
-    // Sign out from Supabase
     await AuthService.signOut();
     
-    // Navigate to login
     if (context.mounted) {
       context.go(AppRoutes.login);
     }
   } catch (e) {
-    print('Logout error: $e');
+    developer.log('Logout error: $e', name: 'AuthHooks');
     // Still navigate to login even if logout fails
     if (context.mounted) {
       context.go(AppRoutes.login);
@@ -117,9 +104,10 @@ Future<void> useAuthLogout(BuildContext context) async {
 // Hook untuk reset password
 Future<bool> useAuthResetPassword(String email) async {
   try {
-    return await AuthService.resetPassword(email);
+    final result = await AuthService.resetPassword(email);
+    return result.success;
   } catch (e) {
-    print('Reset password hook error: $e');
+    developer.log('Reset password hook error: $e', name: 'AuthHooks');
     return false;
   }
 }
@@ -127,9 +115,10 @@ Future<bool> useAuthResetPassword(String email) async {
 // Hook untuk resend email confirmation
 Future<bool> useResendEmailConfirmation(String email) async {
   try {
-    return await AuthService.resendEmailConfirmation(email);
+    final result = await AuthService.resendVerificationEmail(email);
+    return result.success;
   } catch (e) {
-    print('Resend email confirmation hook error: $e');
+    developer.log('Resend email confirmation hook error: $e', name: 'AuthHooks');
     return false;
   }
 }
@@ -139,7 +128,7 @@ Future<PenggunaModel?> useCurrentPengguna() async {
   try {
     return await AuthService.getCurrentPengguna();
   } catch (e) {
-    print('Get current pengguna error: $e');
+    developer.log('Get current pengguna error: $e', name: 'AuthHooks');
     return null;
   }
 }
@@ -147,67 +136,42 @@ Future<PenggunaModel?> useCurrentPengguna() async {
 // Hook untuk check user role
 Future<bool> useHasRole(PeranEnum requiredRole) async {
   try {
-    return await AuthService.hasRole(requiredRole);
+    final user = await AuthService.getCurrentPengguna();
+    return user?.peran == requiredRole;
   } catch (e) {
-    print('Check role error: $e');
+    developer.log('Check role error: $e', name: 'AuthHooks');
     return false;
   }
 }
 
-// Helper function untuk error messages
-String _getLoginErrorMessage(String error) {
-  if (error.contains('Invalid login credentials')) {
-    return 'Email atau password salah';
-  } else if (error.contains('Email not confirmed')) {
-    return 'Email belum diverifikasi. Periksa inbox Anda.';
-  } else if (error.contains('Too many requests')) {
-    return 'Terlalu banyak percobaan. Coba lagi nanti.';
-  } else if (error.contains('tidak aktif')) {
-    return 'Akun Anda tidak aktif. Hubungi administrator.';
+// Google Sign In hook (placeholder)
+Future<GoogleSignInResult> useGoogleSignIn(BuildContext context, {bool isRegister = false}) async {
+  try {
+    // TODO: Implement Google Auth Service
+    return GoogleSignInResult(
+      success: false,
+      message: 'Google Sign In belum diimplementasi.',
+    );
+  } catch (e) {
+    developer.log('Google Sign In hook error: $e', name: 'AuthHooks');
+    return GoogleSignInResult(
+      success: false,
+      message: 'Terjadi kesalahan saat login dengan Google: ${e.toString()}',
+    );
   }
-  return 'Terjadi kesalahan saat login. Silakan coba lagi.';
 }
 
-String _getRegisterErrorMessage(String error) {
-  if (error.contains('User already registered')) {
-    return 'Email sudah terdaftar. Gunakan email lain atau login.';
-  } else if (error.contains('Password should be at least 6 characters')) {
-    return 'Password minimal 6 karakter';
-  } else if (error.contains('Unable to validate email address')) {
-    return 'Format email tidak valid';
-  } else if (error.contains('Password is too weak')) {
-    return 'Password terlalu lemah. Gunakan kombinasi huruf, angka, dan simbol.';
-  } else if (error.contains('duplicate key value violates unique constraint')) {
-    if (error.contains('email')) {
-      return 'Email sudah terdaftar';
-    } else if (error.contains('nomor_telepon')) {
-      return 'Nomor telepon sudah terdaftar';
-    }
-  }
-  return 'Terjadi kesalahan saat registrasi. Silakan coba lagi.';
-}
-
-// Result classes untuk better error handling
-class LoginResult {
+// Google Sign In Result Model
+class GoogleSignInResult {
   final bool success;
   final String message;
-  final bool needsEmailVerification;
+  final PeranEnum? peran;
+  final dynamic user;
 
-  LoginResult({
+  GoogleSignInResult({
     required this.success,
     required this.message,
-    this.needsEmailVerification = false,
-  });
-}
-
-class RegisterResult {
-  final bool success;
-  final String message;
-  final bool needsEmailVerification;
-
-  RegisterResult({
-    required this.success,
-    required this.message,
-    this.needsEmailVerification = false,
+    this.peran,
+    this.user,
   });
 }

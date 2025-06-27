@@ -1,64 +1,119 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:gofield/core/services/auth_service/pengguna_service.dart';
 import 'package:gofield/core/models/pengguna_model.dart';
-import 'package:gofield/core/models/auth_result.dart';
+
+class AuthResult {
+  final bool success;
+  final String message;
+  final User? user;
+  final bool? needsEmailVerification;
+
+  AuthResult({
+    required this.success,
+    required this.message,
+    this.user,
+    this.needsEmailVerification,
+  });
+}
 
 class AuthService {
   static final _supabase = Supabase.instance.client;
 
-  // Sign up with email and password
+  // Sign up with email verification
   static Future<AuthResult> signUpWithEmailPassword({
     required String email,
     required String password,
     required String namaLengkap,
-    String? nomorTelepon,
-    String? alamat,
     required PeranEnum peran,
+    String? nomorTelepon,
   }) async {
     try {
-      final AuthResponse response = await _supabase.auth.signUp(
+      // Step 1: Create auth user WITHOUT custom redirect
+      final authResponse = await _supabase.auth.signUp(
         email: email,
         password: password,
+        // Remove emailRedirectTo for now - let Supabase handle default
       );
 
-      if (response.user == null) {
+      if (authResponse.user == null) {
         return AuthResult(
           success: false,
           message: 'Gagal membuat akun. Silakan coba lagi.',
         );
       }
 
-      // Create pengguna record
-      await PenggunaService.createPengguna(
-        idPengguna: response.user!.id,
-        namaLengkap: namaLengkap,
-        email: email,
-        nomorTelepon: nomorTelepon,
-        alamat: alamat,
-        peran: peran,
-      );
+      // Step 2: Insert user data to pengguna table
+      final userData = {
+        'id_pengguna': authResponse.user!.id,
+        'nama_lengkap': namaLengkap,
+        'user_email': email,
+        'nomor_telepon': nomorTelepon ?? '000000000',
+        'peran': peran.name,
+      };
+
+      print('Creating user profile: $userData');
+
+      final profileResponse = await _supabase
+          .from('pengguna')
+          .insert(userData)
+          .select();
+
+      print('Profile created: $profileResponse');
+
+      // Step 3: Sign out user (they need to verify email first)
+      await _supabase.auth.signOut();
 
       return AuthResult(
         success: true,
-        message: 'Akun berhasil dibuat! Silakan cek email untuk verifikasi.',
-        user: response.user,
-        peran: peran,
-        needsEmailVerification: !response.user!.emailConfirmedAt != null,
+        message: 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.',
+        needsEmailVerification: true,
+        user: authResponse.user,
       );
 
-    } catch (e) {
-      print('Sign up error: $e');
+    } on AuthException catch (e) {
+      print('Auth Error: ${e.message}');
+      
+      String errorMessage = 'Terjadi kesalahan saat membuat akun.';
+      if (e.message.contains('already registered')) {
+        errorMessage = 'Email sudah terdaftar. Silakan gunakan email lain.';
+      } else if (e.message.contains('password')) {
+        errorMessage = 'Password terlalu lemah. Minimal 6 karakter.';
+      }
+      
       return AuthResult(
         success: false,
-        message: _getAuthErrorMessage(e.toString()),
+        message: errorMessage,
+      );
+    } on PostgrestException catch (e) {
+      print('Database Error: ${e.message}');
+      
+      // If profile creation fails, we should ideally clean up auth user
+      // But Supabase doesn't allow client-side user deletion
+      
+      String errorMessage = 'Gagal menyimpan data profil.';
+      if (e.code == '23505') { // Unique constraint violation
+        errorMessage = 'Data sudah ada. Silakan gunakan data yang berbeda.';
+      }
+      
+      return AuthResult(
+        success: false,
+        message: errorMessage,
+      );
+    } catch (e) {
+      print('General Error: $e');
+      return AuthResult(
+        success: false,
+        message: 'Terjadi kesalahan tidak terduga: ${e.toString()}',
       );
     }
   }
 
-  // Sign in with email and password
-  static Future<AuthResult> signInWithEmailPassword(String email, String password) async {
+  // Sign in
+  static Future<AuthResult> signInWithEmailPassword({
+    required String email,
+    required String password,
+  }) async {
     try {
-      final AuthResponse response = await _supabase.auth.signInWithPassword(
+      final response = await _supabase.auth.signInWithPassword(
         email: email,
         password: password,
       );
@@ -66,12 +121,13 @@ class AuthService {
       if (response.user == null) {
         return AuthResult(
           success: false,
-          message: 'Email atau password salah.',
+          message: 'Login gagal. Periksa email dan password Anda.',
         );
       }
 
-      // Check if email is confirmed
+      // Check if email is verified
       if (response.user!.emailConfirmedAt == null) {
+        await _supabase.auth.signOut();
         return AuthResult(
           success: false,
           message: 'Email belum diverifikasi. Silakan cek email Anda.',
@@ -79,95 +135,112 @@ class AuthService {
         );
       }
 
-      // Get user role from pengguna table
-      final pengguna = await PenggunaService.getPenggunaById(response.user!.id);
-      
-      if (pengguna == null) {
-        return AuthResult(
-          success: false,
-          message: 'Data pengguna tidak ditemukan.',
-        );
-      }
-
-      if (!pengguna.aktif) {
-        return AuthResult(
-          success: false,
-          message: 'Akun Anda tidak aktif. Hubungi administrator.',
-        );
-      }
-
       return AuthResult(
         success: true,
         message: 'Login berhasil!',
         user: response.user,
-        peran: pengguna.peran,
       );
 
-    } catch (e) {
-      print('Sign in error: $e');
+    } on AuthException catch (e) {
+      print('Login Error: ${e.message}');
+      
+      String errorMessage = 'Login gagal.';
+      if (e.message.contains('Invalid login credentials')) {
+        errorMessage = 'Email atau password salah.';
+      } else if (e.message.contains('Email not confirmed')) {
+        errorMessage = 'Email belum diverifikasi. Silakan cek email Anda.';
+      }
+      
       return AuthResult(
         success: false,
-        message: _getAuthErrorMessage(e.toString()),
+        message: errorMessage,
+      );
+    } catch (e) {
+      print('Login General Error: $e');
+      return AuthResult(
+        success: false,
+        message: 'Terjadi kesalahan: ${e.toString()}',
       );
     }
   }
 
-  // Sign out
-  static Future<void> signOut() async {
-    try {
-      await _supabase.auth.signOut();
-    } catch (e) {
-      print('Sign out error: $e');
-      rethrow;
-    }
-  }
-
-  // Reset password
-  static Future<bool> resetPassword(String email) async {
-    try {
-      await _supabase.auth.resetPasswordForEmail(email);
-      return true;
-    } catch (e) {
-      print('Reset password error: $e');
-      return false;
-    }
-  }
-
-  // Resend email confirmation
-  static Future<bool> resendEmailConfirmation(String email) async {
+  // Resend verification email
+  static Future<AuthResult> resendVerificationEmail(String email) async {
     try {
       await _supabase.auth.resend(
         type: OtpType.signup,
         email: email,
       );
-      return true;
+
+      return AuthResult(
+        success: true,
+        message: 'Email verifikasi telah dikirim ulang.',
+      );
     } catch (e) {
-      print('Resend email confirmation error: $e');
-      return false;
+      return AuthResult(
+        success: false,
+        message: 'Gagal mengirim ulang email verifikasi.',
+      );
     }
   }
 
   // Get current user
-  static User? get currentUser => _supabase.auth.currentUser;
+  static User? getCurrentUser() {
+    return _supabase.auth.currentUser;
+  }
+
+  // Sign out
+  static Future<void> signOut() async {
+    await _supabase.auth.signOut();
+  }
 
   // Check if user is logged in
-  static bool get isLoggedIn => _supabase.auth.currentUser != null;
+  static bool isLoggedIn() {
+    return _supabase.auth.currentUser != null;
+  }
 
-  // Helper method for error messages
-  static String _getAuthErrorMessage(String error) {
-    if (error.contains('Invalid login credentials')) {
-      return 'Email atau password salah.';
-    } else if (error.contains('Email not confirmed')) {
-      return 'Email belum diverifikasi. Silakan cek email Anda.';
-    } else if (error.contains('User already registered')) {
-      return 'Email sudah terdaftar. Silakan login atau gunakan email lain.';
-    } else if (error.contains('Password should be at least 6 characters')) {
-      return 'Password minimal 6 karakter.';
-    } else if (error.contains('Unable to validate email address')) {
-      return 'Format email tidak valid.';
-    } else if (error.contains('Network request failed')) {
-      return 'Tidak ada koneksi internet. Periksa koneksi Anda.';
+  // Get current user profile from pengguna table
+  static Future<PenggunaModel?> getCurrentPengguna() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return null;
+
+      final response = await _supabase
+          .from('pengguna')
+          .select()
+          .eq('id_pengguna', user.id)
+          .single();
+
+      return PenggunaModel.fromJson(response);
+    } catch (e) {
+      print('Get current pengguna error: $e');
+      return null;
     }
-    return 'Terjadi kesalahan. Silakan coba lagi.';
+  }
+
+  // Reset password
+  static Future<AuthResult> resetPassword(String email) async {
+    try {
+      await _supabase.auth.resetPasswordForEmail(email);
+      return AuthResult(
+        success: true,
+        message: 'Link reset password telah dikirim ke email Anda.',
+      );
+    } catch (e) {
+      return AuthResult(
+        success: false,
+        message: 'Gagal mengirim email reset password.',
+      );
+    }
+  }
+
+  // Check if user has specific role
+  static Future<bool> hasRole(PeranEnum requiredRole) async {
+    try {
+      final pengguna = await getCurrentPengguna();
+      return pengguna?.peran == requiredRole;
+    } catch (e) {
+      return false;
+    }
   }
 }
