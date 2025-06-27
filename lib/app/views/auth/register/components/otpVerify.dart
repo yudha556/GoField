@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/components/components.dart';
-import 'package:gofield/core/services/auth_service/auth_service.dart';
+// import 'package:gofield/core/services/auth_service/auth_service.dart';
 
 class VerifyPage extends StatelessWidget {
   const VerifyPage({super.key});

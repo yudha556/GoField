@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:gofield/core/services/auth_service/pengguna_service.dart';
 import 'package:gofield/core/models/pengguna_model.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 class GoogleAuthService {
   static final _supabase = Supabase.instance.client;
