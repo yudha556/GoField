@@ -1,7 +1,7 @@
 class PenggunaModel {
   final String idPengguna;
   final String namaLengkap;
-  final String userEmail; // Now included
+  final String userEmail; 
   final String nomorTelepon;
   final String? alamat;
   final PeranEnum peran;
@@ -60,7 +60,6 @@ class PenggunaModel {
       'nomor_telepon': nomorTelepon,
       'alamat': alamat,
       'peran': peran.value,
-      // tanggal_daftar dan aktif akan menggunakan default value
     };
   }
 
