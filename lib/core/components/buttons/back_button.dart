@@ -36,8 +36,8 @@ class CustomBackButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
-                Icons.arrow_back_ios,
-                size: 18,
+                Icons.arrow_back,
+                size: 20,
                 color: iconColor ?? Colors.grey.shade700,
               ),
             ),
