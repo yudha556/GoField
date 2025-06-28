@@ -24,4 +24,9 @@ class AppRoutes {
   static const String userListPage = '/home/list';
   static const String userTransactionDetail = '/transaksi/id';
   static const String userSettingPage = '/settings';
+
+  // register owner
+  static const String userRegisterToOwner = '/registerToOwner';
+  static const String OwnerRegisterForm = '/registerForm';
+  static const String waitingRegister = '/waitingRegister';
 }

@@ -19,6 +19,12 @@ import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
     as UserTransaksiDetail;
 import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
     as UserSettingPage;
+import 'package:gofield/app/views/user/app/registerOwner/page.dart'
+    as UserRegisterToOwner;
+import 'package:gofield/app/views/user/app/registerOwner/components/daftarLapangan.dart'
+    as OwnerRegisterForm;
+import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegister.dart'
+    as WaitingRegisterToOwner;
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -140,6 +146,29 @@ class AppRouter {
         name: 'Settings',
         builder: (context, state) {
           return const UserSettingPage.Settingpage();
+        },
+      ),
+
+      // user register ke owner
+      GoRoute(
+        path: AppRoutes.userRegisterToOwner,
+        name: 'Register To Owner',
+        builder: (context, state) {
+          return const UserRegisterToOwner.OwnerRegister();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.OwnerRegisterForm,
+        name: 'Owner Register Form',
+        builder: (context, state) {
+          return const OwnerRegisterForm.Daftarlapangan();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.waitingRegister,
+        name: 'waiting Register Page',
+        builder: (context, state) {
+          return const WaitingRegisterToOwner.WaitingPage();
         },
       ),
     ],

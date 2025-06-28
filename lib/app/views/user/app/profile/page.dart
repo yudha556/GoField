@@ -427,6 +427,67 @@ class _ProfileContentState extends State<ProfileContent> {
               ],
             ),
           ),
+          Container(
+            width: double.maxFinite,
+            height: 6,
+            color: Colors.grey[300],
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Pendaftaran',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 3),
+                GestureDetector(
+                  onTap: () {
+                    context.go(AppRoutes.userRegisterToOwner);
+                  },
+                  child: Container(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.add_business_outlined, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Daftar Sebagai Owner',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           SizedBox(height: 8),
           // pemisah
           Container(
@@ -659,7 +720,72 @@ class _ProfileContentState extends State<ProfileContent> {
                 ),
               ],
             ),
-          ),
+          ), //
+          SizedBox(height: 8,),
+                Container(
+                  width: double.maxFinite,
+                  height: 6,
+                  color: Colors.grey[300],
+                ),
+                SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Akun',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      SizedBox(height: 3),
+                      GestureDetector(
+                        onTap: () {
+                          context.go(AppRoutes.login);
+                        },
+                        child: Container(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 12,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.logout, size: 20),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Keluar',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w300,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                  color: Colors.grey[600],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
           SizedBox(height: 80),
         ],
