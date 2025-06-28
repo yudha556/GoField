@@ -13,14 +13,12 @@ class ProfilePage extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Color(0xFF0088E8),
-        statusBarIconBrightness: Brightness.dark, 
+        statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.light, // IOS
       ),
       child: const MainUserScaffold(
         showNavBar: true,
-        child: SafeArea(
-          child: ProfileContent(),
-        ),
+        child: SafeArea(child: ProfileContent()),
       ),
     );
   }
@@ -47,7 +45,7 @@ class _ProfileContentState extends State<ProfileContent> {
             children: [
               // Background gradient
               Container(
-                height:180,
+                height: 180,
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
@@ -61,7 +59,10 @@ class _ProfileContentState extends State<ProfileContent> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 25),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18.0,
+                    vertical: 25,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -94,7 +95,7 @@ class _ProfileContentState extends State<ProfileContent> {
                       IconButton(
                         icon: const Icon(Icons.settings, color: Colors.white),
                         onPressed: () {
-                          Navigator.pushNamed(context, '/settings');
+                          context.go(AppRoutes.userSettingPage);
                         },
                       ),
                     ],
@@ -402,7 +403,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.favorite, size: 20,),
+                              Icon(Icons.favorite, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 'Lapangan favorit',
@@ -494,12 +495,16 @@ class _ProfileContentState extends State<ProfileContent> {
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          _isCustomerServiceExpanded = !_isCustomerServiceExpanded;
+                          _isCustomerServiceExpanded =
+                              !_isCustomerServiceExpanded;
                         });
                       },
                       child: Container(
                         child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 12,
+                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -519,7 +524,7 @@ class _ProfileContentState extends State<ProfileContent> {
                               ),
                               // Animated Icon Rotation
                               AnimatedRotation(
-                                turns: _isCustomerServiceExpanded ? 0.25 : 0.0, 
+                                turns: _isCustomerServiceExpanded ? 0.25 : 0.0,
                                 duration: Duration(milliseconds: 200),
                                 child: Icon(
                                   Icons.arrow_forward_ios,
@@ -532,7 +537,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         ),
                       ),
                     ),
-                    
+
                     // Animated Dropdown Content
                     AnimatedContainer(
                       duration: Duration(milliseconds: 500),
@@ -541,61 +546,75 @@ class _ProfileContentState extends State<ProfileContent> {
                         duration: Duration(milliseconds: 300),
                         opacity: _isCustomerServiceExpanded ? 1.0 : 0.0,
                         child: _isCustomerServiceExpanded
-                          ? Container(
-                              margin: EdgeInsets.only(left: 16),
-                              child: Column(
-                                children: [
-                                  // WhatsApp Option
-                                  GestureDetector(
-                                    onTap: () {
-                                      print('WhatsApp tapped');
-                                    },
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.chat, size: 18, color: Colors.green),
-                                          SizedBox(width: 12),
-                                          Text(
-                                            'WhatsApp',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w300,
-                                              color: Colors.grey[700],
+                            ? Container(
+                                margin: EdgeInsets.only(left: 16),
+                                child: Column(
+                                  children: [
+                                    // WhatsApp Option
+                                    GestureDetector(
+                                      onTap: () {
+                                        print('WhatsApp tapped');
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 12,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.chat,
+                                              size: 18,
+                                              color: Colors.green,
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(width: 12),
+                                            Text(
+                                              'WhatsApp',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w300,
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  
-                                  // Email Option
-                                  GestureDetector(
-                                    onTap: () {
-                                      print('Email tapped');
-                                    },
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.email_outlined, size: 18, color: Colors.blue),
-                                          SizedBox(width: 12),
-                                          Text(
-                                            'Email',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w300,
-                                              color: Colors.grey[700],
+
+                                    // Email Option
+                                    GestureDetector(
+                                      onTap: () {
+                                        print('Email tapped');
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 12,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.email_outlined,
+                                              size: 18,
+                                              color: Colors.blue,
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(width: 12),
+                                            Text(
+                                              'Email',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w300,
+                                                color: Colors.grey[700],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : SizedBox.shrink(),
+                                  ],
+                                ),
+                              )
+                            : SizedBox.shrink(),
                       ),
                     ),
                   ],

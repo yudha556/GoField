@@ -17,6 +17,8 @@ import 'package:gofield/app/views/user/app/home/components/list.dart'
     as userListPage;
 import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
     as UserTransaksiDetail;
+import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
+    as UserSettingPage;
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -131,6 +133,13 @@ class AppRouter {
         name: 'Transaction Detail',
         builder: (context, state) {
           return const UserTransaksiDetail.TransactionDetail();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.userSettingPage,
+        name: 'Settings',
+        builder: (context, state) {
+          return const UserSettingPage.Settingpage();
         },
       ),
     ],
