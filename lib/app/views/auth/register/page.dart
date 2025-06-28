@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gofield/core/models/pengguna_model.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:flutter/gestures.dart';
-import 'package:gofield/core/components/components.dart'; 
+import 'package:gofield/core/components/components.dart';
+import 'package:gofield/core/services/auth_service/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -20,9 +24,26 @@ class _RegisterPageState extends State<RegisterPage> {
       TextEditingController();
 
   bool _agreeToTerms = false;
+  bool _isGoogleLoading = false;
+  StreamSubscription<AuthState>? _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _authSubscription = AuthService.authStateChanges.listen((data) {
+      final AuthChangeEvent event = data.event;
+      final Session? session = data.session;
+      
+      if (event == AuthChangeEvent.signedIn && session != null && _isGoogleLoading) {
+        _handleGoogleCallback();
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _authSubscription?.cancel();
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -30,9 +51,128 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  // Handle Google OAuth callback
+  Future<void> _handleGoogleCallback() async {
+    try {
+      final result = await AuthService.handleGoogleCallback(
+        peran: PeranEnum.pengguna,
+        isSignUp: true, 
+      );
+
+      if (mounted) {
+        setState(() {
+          _isGoogleLoading = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.message),
+            backgroundColor: result.success ? Colors.green : Colors.red,
+          ),
+        );
+
+        if (result.success) {
+          context.go(AppRoutes.userDashboard);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isGoogleLoading = false;
+        });
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Method untuk handle Google Sign-Up
+  Future<void> _handleGoogleSignUp() async {
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Anda harus menyetujui Syarat dan Ketentuan terlebih dahulu'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isGoogleLoading = true;
+    });
+
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Menunggu proses Google Sign-In...'),
+              SizedBox(height: 8),
+              Text(
+                'Aplikasi akan membuka browser. Silakan login dengan akun Google Anda.',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+
+      final result = await AuthService.signUpWithGoogle(
+        peran: PeranEnum.pengguna,
+      );
+
+      // Hide loading dialog
+      if (mounted) Navigator.of(context).pop();
+
+      if (result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.message),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        context.go(AppRoutes.userDashboard); 
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) Navigator.of(context).pop();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGoogleLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('RegisterPage: build called');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -182,18 +322,104 @@ class _RegisterPageState extends State<RegisterPage> {
               PrimaryButton(
                 text: 'Daftar',
                 isFullWidth: true,
-                isLoading: false, 
-                onPressed: _agreeToTerms ? () {
-                  context.go(AppRoutes.verify);
-                  print('Register button pressed!');
-                  print('Nama: ${_nameController.text}');
-                  print('Email: ${_emailController.text}');
-                  print('Password: ${_passwordController.text}');
-                  print(
-                    'Konfirmasi Password: ${_confirmPasswordController.text}',
-                  );
-                  print('Setuju S&K: $_agreeToTerms');
-                } : null, 
+                isLoading: false, // You can add loading state here
+                onPressed: _agreeToTerms ? () async {
+                  final nama = _nameController.text.trim();
+                  final email = _emailController.text.trim();
+                  final password = _passwordController.text;
+                  final konfirmasiPassword = _confirmPasswordController.text;
+
+                  // Validation
+                  if (nama.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Nama lengkap tidak boleh kosong'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
+                  if (email.isEmpty || !email.contains('@')) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Email tidak valid'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
+                  if (password.length < 6) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Password minimal 6 karakter'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
+                  if (password != konfirmasiPassword) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Password tidak cocok'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
+
+                  try {
+                    // Show loading
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+
+                    final result = await AuthService.signUpWithEmailPassword(
+                      email: email,
+                      password: password,
+                      namaLengkap: nama,
+                      peran: PeranEnum.pengguna,
+                    );
+
+                    // Hide loading
+                    Navigator.of(context).pop();
+
+                    if (result.success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.message),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      // Navigate to verification page
+                      context.go(AppRoutes.verify);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.message),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    // Hide loading if still showing
+                    Navigator.of(context).pop();
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: ${e.toString()}'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                } : null,
               ),
               const SizedBox(height: 24.0),
 
@@ -213,12 +439,10 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               const SizedBox(height: 20.0),
 
-              // --- Google Icon Button ---
+              // --- Google Icon Button (Updated) ---
               Center(
                 child: InkWell(
-                  onTap: () {
-                    print('Register with Google (icon only) pressed!');
-                  },
+                  onTap: _isGoogleLoading ? null : _handleGoogleSignUp,
                   borderRadius: BorderRadius.circular(28.0),
                   child: Container(
                     width: 56.0,
@@ -237,11 +461,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       ],
                     ),
                     padding: const EdgeInsets.all(16.0),
-                    child: SvgPicture.asset(
-                      'assets/icons/icons-google.svg',
-                      height: 24.0,
-                      width: 24.0,
-                    ),
+                    child: _isGoogleLoading
+                        ? const CircularProgressIndicator(strokeWidth: 2)
+                        : SvgPicture.asset(
+                            'assets/icons/icons-google.svg',
+                            height: 24.0,
+                            width: 24.0,
+                          ),
                   ),
                 ),
               ),

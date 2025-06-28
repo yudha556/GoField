@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/components/components.dart';
 import 'package:gofield/app/views/auth/hooks/login.hooks.dart';
+// import 'package:gofield/core/models/pengguna_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -26,36 +27,39 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
 
-      // Simulasi login process
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() {
-          _isLoading = false;
-        });
+      try {
+        final result = await useAuthLogin(
+          context,
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
 
-        // Determine role based on email or you can implement your own logic
-        String role = _determineUserRole(_emailController.text);
-        
-        // Call the login hook to navigate to appropriate page
-        useLoginHook(context, role);
-      });
-    }
-  }
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
 
-  String _determineUserRole(String email) {
-    // Simple role determination based on email
-    // You can replace this with actual authentication logic
-    if (email.toLowerCase().contains('admin')) {
-      return 'admin';
-    } else if (email.toLowerCase().contains('owner')) {
-      return 'owner';
-    } else {
-      return 'user';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result.message)),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Terjadi kesalahan saat login')),
+          );
+        }
+      }
     }
   }
 
@@ -90,7 +94,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 20.0),
 
-                // Email form field
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -116,7 +119,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 10.0),
 
-                // Password form field
                 TextFormField(
                   controller: _passwordController,
                   decoration: InputDecoration(
@@ -128,9 +130,9 @@ class _LoginPageState extends State<LoginPage> {
                     prefixIcon: const Icon(Icons.lock),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible 
-                          ? Icons.visibility 
-                          : Icons.visibility_off,
+                        _isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -154,24 +156,36 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 5.0),
 
-                // Forgot password button 
                 Align(
                   alignment: Alignment.centerRight,
                   child: LinkButton(
                     text: 'Lupa Password?',
                     size: ButtonSize.small,
-                    onPressed: () {
-                      print('Forgot password pressed');
+                    onPressed: () async {
+                      final email = _emailController.text.trim();
+                      if (email.isNotEmpty) {
+                        final success = await useAuthResetPassword(email);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Link reset password telah dikirim ke email Anda'
+                                    : 'Gagal mengirim link reset password',
+                              ),
+                            ),
+                          );
+                        }
+                      }
                     },
                   ),
                 ),
                 const SizedBox(height: 20.0),
 
-                // Login button 
                 PrimaryButton(
-                  text: _isLoading ? 'Loading...' : 'Login',
-                  size: ButtonSize.medium,
+                  text: 'Login',
                   isFullWidth: true,
+                  isLoading: _isLoading,
                   onPressed: _isLoading ? null : _handleLogin,
                 ),
                 const SizedBox(height: 24.0),
@@ -191,11 +205,24 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 20.0),
 
-                // Google icon button 
                 Center(
                   child: InkWell(
-                    onTap: () {
-                      print('Login with Google (icon only) pressed!');
+                    onTap: () async {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      
+                      final result = await useGoogleSignIn(context);
+                      
+                      if (mounted) {
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result.message)),
+                        );
+                      }
                     },
                     borderRadius: BorderRadius.circular(28.0),
                     child: Container(
@@ -203,7 +230,10 @@ class _LoginPageState extends State<LoginPage> {
                       height: 56.0,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.grey[300]!, width: 1.5),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          width: 1.5,
+                        ),
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
@@ -225,7 +255,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 30.0),
 
-                // Register button 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -238,32 +267,9 @@ class _LoginPageState extends State<LoginPage> {
                       size: ButtonSize.small,
                       onPressed: () {
                         context.go(AppRoutes.register);
-                        print('Register button pressed');
                       },
                     ),
                   ],
-                ),
-
-                // Development helper text
-                const SizedBox(height: 20.0),
-                Container(
-                  padding: const EdgeInsets.all(12.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[50],
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.blue[200]!),
-                  ),
-                  child: const Text(
-                    'Development Mode:\n'
-                    '• Email dengan "admin" → Admin Dashboard\n'
-                    '• Email dengan "owner" → Owner Dashboard\n'
-                    '• Email lainnya → User Dashboard',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
                 ),
               ],
             ),
