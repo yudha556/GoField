@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/core/components/buttons/button.dart';
+import 'package:gofield/core/models/pengguna_model.dart';
 import 'package:gofield/core/router/app_routes.dart';
+import 'package:gofield/core/services/auth_service/auth_service.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -33,8 +35,23 @@ class ProfileContent extends StatefulWidget {
 
 class _ProfileContentState extends State<ProfileContent> {
   bool _isCustomerServiceExpanded = false;
+  PenggunaModel? _pengguna;
+  bool _isloading = true;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchPengguna();
+  }
+
+  Future<void> _fetchPengguna() async {
+    final result = await AuthService.getCurrentPengguna();
+    setState(() {
+      _pengguna = result;
+      _isloading = false;
+    });
+  }
+
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 0),
@@ -43,7 +60,6 @@ class _ProfileContentState extends State<ProfileContent> {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              // Background gradient
               Container(
                 height: 180,
                 decoration: const BoxDecoration(
@@ -78,16 +94,26 @@ class _ProfileContentState extends State<ProfileContent> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                'Turki Alfaend Damanik',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            Expanded(
+                              child: _isloading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      _pengguna?.namaLengkap ??
+                                          'Tidak diketahui',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                             ),
                           ],
                         ),
@@ -126,7 +152,6 @@ class _ProfileContentState extends State<ProfileContent> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // Kiri - Total Lapangan
                       const Expanded(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -153,10 +178,8 @@ class _ProfileContentState extends State<ProfileContent> {
                         ),
                       ),
 
-                      // Garis vertikal
                       Container(width: 1, height: 50, color: Colors.grey[300]),
 
-                      // Kanan - Total Point
                       const Expanded(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -273,7 +296,6 @@ class _ProfileContentState extends State<ProfileContent> {
                         ),
                       ),
 
-                      // Gunakan LinkButton yang sudah ada
                       LinkButton(
                         text: 'Detail',
                         size: ButtonSize.small,
@@ -721,71 +743,68 @@ class _ProfileContentState extends State<ProfileContent> {
               ],
             ),
           ), //
-          SizedBox(height: 8,),
-                Container(
-                  width: double.maxFinite,
-                  height: 6,
-                  color: Colors.grey[300],
-                ),
-                SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 8,
+          SizedBox(height: 8),
+          Container(
+            width: double.maxFinite,
+            height: 6,
+            color: Colors.grey[300],
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Akun',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Akun',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey,
-                        ),
+                ),
+                SizedBox(height: 3),
+                GestureDetector(
+                  onTap: () {
+                    context.go(AppRoutes.login);
+                  },
+                  child: Container(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 12,
                       ),
-                      SizedBox(height: 3),
-                      GestureDetector(
-                        onTap: () {
-                          context.go(AppRoutes.login);
-                        },
-                        child: Container(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.logout, size: 20),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'Keluar',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                    ),
-                                  ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.logout, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Keluar',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w300,
                                 ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 16,
-                                  color: Colors.grey[600],
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
+              ],
+            ),
+          ),
 
           SizedBox(height: 80),
         ],

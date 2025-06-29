@@ -4,6 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:gofield/core/components/buttons/button.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
+import 'package:gofield/core/models/pengguna_model.dart';
+import 'package:gofield/core/services/auth_service/auth_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
+import 'package:permission_handler/permission_handler.dart';
 
 class Settingpage extends StatelessWidget {
   const Settingpage({super.key});
@@ -37,13 +43,83 @@ class _SettingContentState extends State<SettingContent> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  PenggunaModel? _pengguna;
+  bool _isloading = true;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchPengguna();
+  }
+
+  Future<void> _fetchPengguna() async {
+    final result = await AuthService.getCurrentPengguna();
+    setState(() {
+      _pengguna = result;
+      _isloading = false;
+
+      if (_pengguna != null) {
+        firstNameController.text = _pengguna!.namaLengkap;
+        addressController.text = _pengguna!.alamat ?? '';
+        phoneController.text = _pengguna!.nomorTelepon;
+        emailController.text = _pengguna!.userEmail;
+      }
+    });
+  }
+
+
+Future<void> _pickAndUploadImage() async {
+  // Masih error ini mbah gpt ga ngatasin soale
+  final status = await Permission.storage.request();
+
+  if (!status.isGranted) {
+    print('❌ Izin akses foto ditolak.');
+    return;
+  }
+
+  final picker = ImagePicker();
+  final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile != null && _pengguna != null) {
+    final Uint8List bytes = await pickedFile.readAsBytes();
+    final filePath = 'profilepictures/${_pengguna!.idPengguna}/profile.jpg';
+
+    try {
+      await Supabase.instance.client.storage
+          .from('profilepictures')
+          .uploadBinary(
+            filePath,
+            bytes,
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+      final publicUrl = Supabase.instance.client.storage
+          .from('profilepictures')
+          .getPublicUrl(filePath);
+
+      // update imageUrl ke DB
+      final updated = _pengguna!.copyWith(
+        imageUrl: publicUrl,
+      );
+
+      final success = await AuthService.updatePengguna(updated);
+      if (success) {
+        setState(() {
+          _pengguna = updated;
+        });
+      }
+    } catch (e) {
+      print('Upload gagal: $e');
+    }
+  }
+}
+
+
+
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // BAGIAN ATAS (GRADIENT + BACK BUTTON)
           Stack(
             clipBehavior: Clip.none,
             children: [
@@ -64,7 +140,6 @@ class _SettingContentState extends State<SettingContent> {
                 ),
               ),
 
-              // TITLE DI TENGAH
               Positioned(
                 top: 30,
                 left: 0,
@@ -81,7 +156,6 @@ class _SettingContentState extends State<SettingContent> {
                 ),
               ),
 
-              // TOMBOL KEMBALI DI KIRI ATAS
               Positioned(
                 top: 13,
                 left: 18,
@@ -94,8 +168,6 @@ class _SettingContentState extends State<SettingContent> {
                 ),
               ),
 
-              // FOTO PROFIL BULAT
-              // FOTO PROFIL BULAT
               Positioned(
                 bottom: -50,
                 left: 0,
@@ -105,35 +177,34 @@ class _SettingContentState extends State<SettingContent> {
                     alignment: Alignment.bottomRight,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(3), // tebal border
+                        padding: EdgeInsets.all(3), 
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: Colors.white,
                             width: 3,
-                          ), // border putih
+                          ), 
                         ),
+                        // foto profile masih eror gatau kenapa ga bisa buka permissions
                         child: CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.grey.shade200,
-                          backgroundImage: AssetImage(
-                            'assets/images/contoh.jpg',
-                          ),
+                          backgroundImage: _pengguna?.imageUrl != null
+                              ? NetworkImage(_pengguna!.imageUrl!)
+                              : const AssetImage('assets/images/contoh.jpg')
+                                    as ImageProvider,
                         ),
                       ),
                       Positioned(
                         bottom: 0,
                         right: 0,
                         child: GestureDetector(
-                          onTap: () {
-                            // TODO: buka picker atau kamera
-                            print("Edit foto profil diklik");
-                          },
+                          onTap: _pickAndUploadImage,
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.blue, // background tombol
+                              color: Colors.blue, 
                               border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: const Icon(
@@ -151,35 +222,19 @@ class _SettingContentState extends State<SettingContent> {
             ],
           ),
 
-          const SizedBox(height: 90), // jarak setelah foto profil
-          // FORM INPUT
+          const SizedBox(height: 90), 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               children: [
-                // First Name & Last Name dalam Row
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: firstNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'First Name',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
+                Expanded(
+                  child: TextField(
+                    controller: firstNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'First Name',
+                      border: OutlineInputBorder(),
                     ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        controller: lastNameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Last Name',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -213,11 +268,10 @@ class _SettingContentState extends State<SettingContent> {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
-                  readOnly: true, // biasanya email ga bisa diedit
+                  readOnly: true, 
                 ),
                 const SizedBox(height: 32),
 
-                // Tombol Batal & Simpan
                 Row(
                   children: [
                     Expanded(
@@ -234,8 +288,39 @@ class _SettingContentState extends State<SettingContent> {
                       child: PrimaryButton(
                         text: 'Simpan',
                         size: ButtonSize.small,
-                        onPressed: () {
-                          print('Simpan di pencet');
+                        onPressed: () async {
+                          setState(() => _isloading = true);
+
+                          final updated = PenggunaModel(
+                            idPengguna: _pengguna!.idPengguna,
+                            namaLengkap: firstNameController.text.trim(),
+                            userEmail: _pengguna!.userEmail,
+                            nomorTelepon: phoneController.text.trim(),
+                            alamat: addressController.text.trim(),
+                            peran: _pengguna!.peran,
+                            tanggalDaftar: _pengguna!.tanggalDaftar,
+                            aktif: _pengguna!.aktif,
+                            imageUrl: _pengguna!.imageUrl,
+                          );
+
+                          final success = await AuthService.updatePengguna(
+                            updated,
+                          );
+
+                          setState(() => _isloading = false);
+
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Profil berhasil disimpan'
+                                    : 'Gagal menyimpan profil',
+                              ),
+                            ),
+                          );
+
+                          if (success) context.go(AppRoutes.userprofilePage);
                         },
                       ),
                     ),

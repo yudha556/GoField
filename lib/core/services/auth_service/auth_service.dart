@@ -569,14 +569,27 @@ class AuthService {
   }
 
   // Check if user has specific role
-  static Future<bool> hasRole(PeranEnum requiredRole) async {
-    try {
-      final pengguna = await getCurrentPengguna();
-      return pengguna?.peran == requiredRole;
-    } catch (e) {
-      return false;
-    }
+static Future<bool> updatePengguna(PenggunaModel pengguna) async {
+  try {
+    final response = await Supabase.instance.client
+    .from('pengguna')
+    .update({
+      'nama_lengkap': pengguna.namaLengkap,
+      'nomor_telepon': pengguna.nomorTelepon,
+      'alamat': pengguna.alamat,
+      'image_url': pengguna.imageUrl,
+    })
+    .eq('id_pengguna', pengguna.idPengguna)
+    .select()
+    .maybeSingle();
+
+    return response != null;
+  } catch (e) {
+    print('Update gagal: $e');
+    return false;
   }
+}
+
 
   // Dispose method untuk cleanup
   static void dispose() {

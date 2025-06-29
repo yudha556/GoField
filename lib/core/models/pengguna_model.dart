@@ -1,7 +1,7 @@
 class PenggunaModel {
   final String idPengguna;
   final String namaLengkap;
-  final String userEmail; 
+  final String userEmail;
   final String nomorTelepon;
   final String? alamat;
   final PeranEnum peran;
@@ -72,6 +72,7 @@ class PenggunaModel {
     PeranEnum? peran,
     DateTime? tanggalDaftar,
     bool? aktif,
+    String? imageUrl,
   }) {
     return PenggunaModel(
       idPengguna: idPengguna ?? this.idPengguna,
@@ -82,6 +83,7 @@ class PenggunaModel {
       peran: peran ?? this.peran,
       tanggalDaftar: tanggalDaftar ?? this.tanggalDaftar,
       aktif: aktif ?? this.aktif,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 
