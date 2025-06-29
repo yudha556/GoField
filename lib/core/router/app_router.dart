@@ -32,6 +32,7 @@ import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegis
 
 // admin router
 import 'package:gofield/app/views/admin/app/peninjauan/page.dart' as AdminAcc;
+// import 'package:gofield/app/views/admin/app/peninjauan/[id]/page.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(

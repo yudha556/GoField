@@ -44,10 +44,7 @@ class PeninjauanContent extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Permintaan Peninjauan'),
-        backgroundColor: const Color(0xFF0088E8),
-      ),
+      backgroundColor: Colors.white,
       body: ListView.builder(
         itemCount: requests.length,
         itemBuilder: (context, index) {
