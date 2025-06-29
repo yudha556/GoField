@@ -29,4 +29,8 @@ class AppRoutes {
   static const String userRegisterToOwner = '/registerToOwner';
   static const String OwnerRegisterForm = '/registerForm';
   static const String waitingRegister = '/waitingRegister';
+
+  // admin route
+  static const String adminPeninjauanPage = '/admin/peninjauan';
+  static const String adminPeninjauanId = '/admin/penjualan/id';
 }

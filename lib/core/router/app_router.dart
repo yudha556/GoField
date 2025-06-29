@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gofield/app/views/admin/app/peninjauan/%5Bid%5D/page.dart';
 import 'package:gofield/app/views/splash/page.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/views/auth/register/page.dart';
@@ -7,6 +8,7 @@ import 'package:gofield/app/views/auth/signIn/page.dart';
 import 'package:gofield/app/views/auth/register/components/otpVerify.dart';
 import 'package:gofield/app/views/admin/app/home/page.dart' as AdminHome;
 import 'package:gofield/app/views/owner/app/home/page.dart' as OwnerHome;
+// user
 import 'package:gofield/app/views/user/app/home/page.dart' as UserHome;
 import 'package:gofield/app/views/user/app/search/page.dart' as UserSearchPage;
 import 'package:gofield/app/views/user/app/profile/page.dart' as UserProfile;
@@ -19,12 +21,17 @@ import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
     as UserTransaksiDetail;
 import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
     as UserSettingPage;
+
+// register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
     as UserRegisterToOwner;
 import 'package:gofield/app/views/user/app/registerOwner/components/daftarLapangan.dart'
     as OwnerRegisterForm;
 import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegister.dart'
     as WaitingRegisterToOwner;
+
+// admin router
+import 'package:gofield/app/views/admin/app/peninjauan/page.dart' as AdminAcc;
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -169,6 +176,22 @@ class AppRouter {
         name: 'waiting Register Page',
         builder: (context, state) {
           return const WaitingRegisterToOwner.WaitingPage();
+        },
+      ),
+
+      // admin router
+      GoRoute(
+        path: AppRoutes.adminPeninjauanPage,
+        name: 'peninjauan',
+        builder: (context, state) {
+          return const AdminAcc.PeninjauanPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.adminPeninjauanId,
+        name: 'peninjauan id',
+        builder: (context, state) {
+          return const IdPeninjauan();
         },
       ),
     ],
