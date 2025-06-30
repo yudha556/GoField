@@ -3,3 +3,5 @@ export 'alerts/banner_alert.dart';
 export 'alerts/dialog_alert.dart';
 export 'alerts/status_alert.dart';
 export 'card/cards.dart';
+export 'avatar/circleAvatar.dart';
+export 'search/searchBar.dart';

@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,7 +33,7 @@ class ProfileContent extends StatefulWidget {
 }
 
 class _ProfileContentState extends State<ProfileContent> {
-  bool _isCustomerServiceExpanded = false;
+  // bool _isCustomerServiceExpanded = false;
   PenggunaModel? _pengguna;
   bool _isloading = true;
 
