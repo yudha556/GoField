@@ -33,4 +33,5 @@ class AppRoutes {
   // admin route
   static const String adminPeninjauanPage = '/admin/peninjauan';
   static const String adminPeninjauanId = '/admin/penjualan/id';
+  static const String adminProfile = '/admin/profile';
 }

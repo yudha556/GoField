@@ -8,19 +8,19 @@ class PeninjauanPage extends StatelessWidget {
   const PeninjauanPage({super.key});
 
   @override
-    Widget build(BuildContext context) {
-      return AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle(
-          statusBarColor: Colors.white,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light, // IOS
-        ),
-        child: const MainAdminSchallfold(
-          child: SafeArea(child: PeninjauanContent()),
-        ),
-      );
-    }
+  Widget build(BuildContext context) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light, // IOS
+      ),
+      child: const MainAdminSchallfold(
+        child: SafeArea(child: PeninjauanContent()),
+      ),
+    );
   }
+}
 
 class PeninjauanContent extends StatelessWidget {
   const PeninjauanContent({super.key});
@@ -45,6 +45,19 @@ class PeninjauanContent extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Center(
+          child: const Text(
+            'Peninjauan',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.white,
+      ),
       body: ListView.builder(
         itemCount: requests.length,
         itemBuilder: (context, index) {
@@ -56,6 +69,7 @@ class PeninjauanContent extends StatelessWidget {
             child: Card(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               elevation: 2,
+              color: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -64,8 +78,13 @@ class PeninjauanContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item['lapangan'] ?? '',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text(
+                      item['lapangan'] ?? '',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Text('Pemilik: ${item['nama']}'),
                     Text('Alamat: ${item['alamat']}'),

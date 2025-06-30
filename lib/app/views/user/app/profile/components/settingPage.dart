@@ -68,51 +68,51 @@ class _SettingContentState extends State<SettingContent> {
   }
 
 
-Future<void> _pickAndUploadImage() async {
-  // Masih error ini mbah gpt ga ngatasin soale
-  final status = await Permission.storage.request();
+// Future<void> _pickAndUploadImage() async {
+//   // Masih error ini mbah gpt ga ngatasin soale
+//   final status = await Permission.storage.request();
 
-  if (!status.isGranted) {
-    print('❌ Izin akses foto ditolak.');
-    return;
-  }
+//   if (!status.isGranted) {
+//     print('❌ Izin akses foto ditolak.');
+//     return;
+//   }
 
-  final picker = ImagePicker();
-  final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+//   final picker = ImagePicker();
+//   final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-  if (pickedFile != null && _pengguna != null) {
-    final Uint8List bytes = await pickedFile.readAsBytes();
-    final filePath = 'profilepictures/${_pengguna!.idPengguna}/profile.jpg';
+//   if (pickedFile != null && _pengguna != null) {
+//     final Uint8List bytes = await pickedFile.readAsBytes();
+//     final filePath = 'profilepictures/${_pengguna!.idPengguna}/profile.jpg';
 
-    try {
-      await Supabase.instance.client.storage
-          .from('profilepictures')
-          .uploadBinary(
-            filePath,
-            bytes,
-            fileOptions: const FileOptions(upsert: true),
-          );
+//     try {
+//       await Supabase.instance.client.storage
+//           .from('profilepictures')
+//           .uploadBinary(
+//             filePath,
+//             bytes,
+//             fileOptions: const FileOptions(upsert: true),
+//           );
 
-      final publicUrl = Supabase.instance.client.storage
-          .from('profilepictures')
-          .getPublicUrl(filePath);
+//       final publicUrl = Supabase.instance.client.storage
+//           .from('profilepictures')
+//           .getPublicUrl(filePath);
 
-      // update imageUrl ke DB
-      final updated = _pengguna!.copyWith(
-        imageUrl: publicUrl,
-      );
+//       // update imageUrl ke DB
+//       final updated = _pengguna!.copyWith(
+//         imageUrl: publicUrl,
+//       );
 
-      final success = await AuthService.updatePengguna(updated);
-      if (success) {
-        setState(() {
-          _pengguna = updated;
-        });
-      }
-    } catch (e) {
-      print('Upload gagal: $e');
-    }
-  }
-}
+//       final success = await AuthService.updatePengguna(updated);
+//       if (success) {
+//         setState(() {
+//           _pengguna = updated;
+//         });
+//       }
+//     } catch (e) {
+//       print('Upload gagal: $e');
+//     }
+//   }
+// }
 
 
 
@@ -186,20 +186,20 @@ Future<void> _pickAndUploadImage() async {
                           ), 
                         ),
                         // foto profile masih eror gatau kenapa ga bisa buka permissions
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.grey.shade200,
-                          backgroundImage: _pengguna?.imageUrl != null
-                              ? NetworkImage(_pengguna!.imageUrl!)
-                              : const AssetImage('assets/images/contoh.jpg')
-                                    as ImageProvider,
-                        ),
+                        // child: CircleAvatar(
+                        //   radius: 50,
+                        //   backgroundColor: Colors.grey.shade200,
+                        //   backgroundImage: _pengguna?.imageUrl != null
+                        //       ? NetworkImage(_pengguna!.imageUrl!)
+                        //       : const AssetImage('assets/images/contoh.jpg')
+                        //             as ImageProvider,
+                        // ),
                       ),
                       Positioned(
                         bottom: 0,
                         right: 0,
                         child: GestureDetector(
-                          onTap: _pickAndUploadImage,
+                          // onTap: _pickAndUploadImage,
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
