@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/admin/app/peninjauan/%5Bid%5D/page.dart';
+import 'package:gofield/app/views/admin/app/profile/page.dart';
 import 'package:gofield/app/views/splash/page.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/views/auth/register/page.dart';
@@ -193,6 +194,13 @@ class AppRouter {
         name: 'peninjauan id',
         builder: (context, state) {
           return const IdPeninjauan();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.adminProfile,
+        name: 'admin profile',
+        builder: (context, state) {
+          return const AdminProfile();
         },
       ),
     ],

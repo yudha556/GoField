@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/core/components/components.dart';
 import 'package:gofield/core/router/app_routes.dart';
+import 'package:uuid/uuid.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Daftarlapangan extends StatefulWidget {
   const Daftarlapangan({super.key});
@@ -292,12 +294,12 @@ class _DaftarlapanganState extends State<Daftarlapangan> {
                       context.go(AppRoutes.userDashboard);
                     },
                   ),
-                  SizedBox(width: 12,),
+                  SizedBox(width: 12),
                   PrimaryButton(
                     text: 'Daftar Sekarang',
                     size: ButtonSize.medium,
                     onPressed: () {
-                      context.go(AppRoutes.waitingRegister);
+                      submitPermintaan();
                     },
                   ),
                 ],
@@ -309,5 +311,61 @@ class _DaftarlapanganState extends State<Daftarlapangan> {
         ),
       ),
     );
+  }
+
+  Future<void> submitPermintaan() async {
+    final supabase = Supabase.instance.client;
+    final uuid = Uuid();
+
+    // Validasi sederhana dulu
+    if (namaLapangan.text.isEmpty || deskripsiLapangan.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Isi semua field yang wajib')),
+      );
+      return;
+    }
+
+    // Ambil user id
+    final userId = supabase.auth.currentUser?.id;
+    if (userId == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Pengguna tidak ditemukan')));
+      return;
+    }
+
+    final fasilitas = [
+      if (wc) 'Toilet/WC',
+      if (makananMinuman) 'Makanan & Minuman',
+      if (parkir) 'Parkiran Luas',
+    ];
+
+    final permintaan = {
+      'id': uuid.v4(),
+      'id_pengguna': userId,
+      'nama_lapangan': namaLapangan.text,
+      'deskripsi_lapangan': deskripsiLapangan.text,
+      'jenis_olahraga': jenisOlahraga ?? '',
+      // 'banyak_lapangan': banyakLapangan ,
+      'nomor_telepon': nomorTelepon.text,
+      'email': email.text,
+      'harga_per_jam': int.tryParse(hargaPerJam.text) ?? 0,
+      'kapasitas': int.tryParse(kapasitas.text) ?? 0,
+      'alamat': alamatLapangan.text,
+      'fasilitas': fasilitas,
+      // 'fasilitas_lain': fasilitasLain.text,
+      'status': 'pending',
+      'tanggal': DateTime.now().toIso8601String(),
+    };
+
+    try {
+      await supabase.from('permintaan_pemilik_lapangan').insert(permintaan);
+      context.go(AppRoutes.waitingRegister);
+    } catch (e) {
+      print('Gagal insert: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal mendaftar. Coba lagi nanti')),
+      );
+    }
   }
 }

@@ -30,7 +30,7 @@ class MainUserScaffold extends StatelessWidget {
       
       bottomNavigationBar: showNavBar ? Container(
         
-        height: 70,
+        height: 90,
         padding: EdgeInsets.symmetric(vertical: 2),
         decoration: BoxDecoration(
           color: Colors.white,

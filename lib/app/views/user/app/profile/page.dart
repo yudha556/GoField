@@ -118,12 +118,12 @@ class _ProfileContentState extends State<ProfileContent> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.settings, color: Colors.white),
-                        onPressed: () {
-                          context.go(AppRoutes.userSettingPage);
-                        },
-                      ),
+                      // IconButton(
+                      //   icon: const Icon(Icons.settings, color: Colors.white),
+                      //   onPressed: () {
+                      //     context.go(AppRoutes.userSettingPage);
+                      //   },
+                      // ),
                     ],
                   ),
                 ),
