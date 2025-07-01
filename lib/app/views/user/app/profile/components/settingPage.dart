@@ -67,54 +67,51 @@ class _SettingContentState extends State<SettingContent> {
     });
   }
 
+  Future<void> _pickAndUploadImage() async {
+    // Masih error ini mbah gpt ga ngatasin soale
+    final status = await Permission.storage.request();
 
-Future<void> _pickAndUploadImage() async {
-  // Masih error ini mbah gpt ga ngatasin soale
-  final status = await Permission.storage.request();
+    if (!status.isGranted) {
+      print('❌ Izin akses foto ditolak.');
+      return;
+    }
 
-  if (!status.isGranted) {
-    print('❌ Izin akses foto ditolak.');
-    return;
-  }
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
 
-  final picker = ImagePicker();
-  final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null && _pengguna != null) {
+      final Uint8List bytes = await pickedFile.readAsBytes();
+      final filePath = 'profilepictures/${_pengguna!.idPengguna}/profile.jpg';
 
-  if (pickedFile != null && _pengguna != null) {
-    final Uint8List bytes = await pickedFile.readAsBytes();
-    final filePath = 'profilepictures/${_pengguna!.idPengguna}/profile.jpg';
+      try {
+        await Supabase.instance.client.storage
+            .from('profilepictures')
+            .uploadBinary(
+              filePath,
+              bytes,
+              fileOptions: const FileOptions(upsert: true),
+            );
 
-    try {
-      await Supabase.instance.client.storage
-          .from('profilepictures')
-          .uploadBinary(
-            filePath,
-            bytes,
-            fileOptions: const FileOptions(upsert: true),
-          );
+        final publicUrl = Supabase.instance.client.storage
+            .from('profilepictures')
+            .getPublicUrl(filePath);
 
-      final publicUrl = Supabase.instance.client.storage
-          .from('profilepictures')
-          .getPublicUrl(filePath);
+        // update imageUrl ke DB
+        final updated = _pengguna!.copyWith(imageUrl: publicUrl);
 
-      // update imageUrl ke DB
-      final updated = _pengguna!.copyWith(
-        imageUrl: publicUrl,
-      );
-
-      final success = await AuthService.updatePengguna(updated);
-      if (success) {
-        setState(() {
-          _pengguna = updated;
-        });
+        final success = await AuthService.updatePengguna(updated);
+        if (success) {
+          setState(() {
+            _pengguna = updated;
+          });
+        }
+      } catch (e) {
+        print('Upload gagal: $e');
       }
-    } catch (e) {
-      print('Upload gagal: $e');
     }
   }
-}
-
-
 
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -177,13 +174,10 @@ Future<void> _pickAndUploadImage() async {
                     alignment: Alignment.bottomRight,
                     children: [
                       Container(
-                        padding: EdgeInsets.all(3), 
+                        padding: EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 3,
-                          ), 
+                          border: Border.all(color: Colors.white, width: 3),
                         ),
                         // foto profile masih eror gatau kenapa ga bisa buka permissions
                         child: CircleAvatar(
@@ -204,7 +198,7 @@ Future<void> _pickAndUploadImage() async {
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.blue, 
+                              color: Colors.blue,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: const Icon(
@@ -222,7 +216,7 @@ Future<void> _pickAndUploadImage() async {
             ],
           ),
 
-          const SizedBox(height: 90), 
+          const SizedBox(height: 90),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Column(
@@ -268,7 +262,7 @@ Future<void> _pickAndUploadImage() async {
                     border: OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
-                  readOnly: true, 
+                  readOnly: true,
                 ),
                 const SizedBox(height: 32),
 

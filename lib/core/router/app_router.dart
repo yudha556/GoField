@@ -21,6 +21,7 @@ import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
     as UserTransaksiDetail;
 import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
     as UserSettingPage;
+import 'package:gofield/app/views/user/components/cart/cart.dart'; // import halaman cart
 
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
@@ -154,6 +155,13 @@ class AppRouter {
         name: 'Settings',
         builder: (context, state) {
           return const UserSettingPage.Settingpage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.userCartPage,
+        name: 'Cart',
+        builder: (context, state) {
+          return const CartPage(); // Halaman keranjang
         },
       ),
 

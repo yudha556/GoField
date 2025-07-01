@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gofield/app/views/user/components/components/cart.dart';
+import 'package:gofield/app/views/user/components/components/cartIcon.dart';
 import 'package:gofield/app/views/user/components/components/notification.dart';
 import 'package:gofield/app/views/user/components/components/profile_button.dart';
 import 'package:gofield/app/views/user/components/components/searchBar.dart';
@@ -61,13 +61,13 @@ class HeaderBar extends StatelessWidget {
               ),
               const SizedBox(width: 18),
             ],
-        
+
             // Cart Button
             if (showCart) ...[
               CartButton(itemCount: cartItemCount, onTap: onCartTap),
               const SizedBox(width: 18),
             ],
-        
+
             // Search Bar - mengambil space yang tersisa
             if (showSearch) ...[
               Expanded(
@@ -78,7 +78,7 @@ class HeaderBar extends StatelessWidget {
               ),
               const SizedBox(width: 18),
             ],
-        
+
             // Profile Button
             if (showProfile)
               ProfileButton(profileImageUrl: null, onProfiletap: null),
@@ -138,7 +138,7 @@ class ActionBar extends StatelessWidget {
           const Spacer(), // Mendorong profile button ke kanan
           // Profile Button
           if (showProfile)
-            ProfileButton(onProfiletap: null, profileImageUrl: null,)
+            ProfileButton(onProfiletap: null, profileImageUrl: null),
         ],
       ),
     );

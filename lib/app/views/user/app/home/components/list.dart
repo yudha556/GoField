@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/user/app/home/components/tabView.dart';
 import 'package:gofield/core/components/components.dart';
 import 'package:gofield/core/router/app_routes.dart';
+import 'package:gofield/app/views/user/components/components/cartIcon.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -41,16 +42,17 @@ class _ListPageState extends State<ListPage> {
         child: SafeArea(
           child: Column(
             children: [
-              // Header + Search
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
+              // Header with Search Bar and Cart Icon using Stack
+              SizedBox(
+                height: 60,
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    // Animated space untuk arrow back
-                    AnimatedContainer(
+                    // Back Arrow
+                    AnimatedPositioned(
                       duration: Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      width: _isSearchFocused ? 0 : 40,
+                      left: _isSearchFocused ? -50 : 16,
+                      top: 10,
                       child: AnimatedOpacity(
                         duration: Duration(milliseconds: 200),
                         opacity: _isSearchFocused ? 0 : 1,
@@ -67,13 +69,15 @@ class _ListPageState extends State<ListPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 12),
 
-                    // Search bar
-                    Expanded(
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
+                    // Search Bar
+                    AnimatedPositioned(
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      left: _isSearchFocused ? 16 : 64,
+                      right: _isSearchFocused ? 16 : 64,
+                      top: 10,
+                      child: Container(
                         height: 42,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -83,7 +87,7 @@ class _ListPageState extends State<ListPage> {
                         child: TextField(
                           focusNode: _focusNode,
                           decoration: InputDecoration(
-                            hintText: 'Cari lapangan...',
+                            hintText: 'Cari lapangan di Go Field',
                             hintStyle: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 14,
@@ -99,6 +103,23 @@ class _ListPageState extends State<ListPage> {
                               vertical: 10,
                             ),
                           ),
+                        ),
+                      ),
+                    ),
+
+                    // Cart Icon
+                    AnimatedPositioned(
+                      duration: Duration(milliseconds: 300),
+                      right: _isSearchFocused ? -50 : 16,
+                      top: 10,
+                      child: AnimatedOpacity(
+                        duration: Duration(milliseconds: 200),
+                        opacity: _isSearchFocused ? 0 : 1,
+                        child: CartButton(
+                          itemCount: 4,
+                          onTap: () => context.go(AppRoutes.userCartPage),
+                          iconColor: Colors.black,
+                          iconSize: 22,
                         ),
                       ),
                     ),
