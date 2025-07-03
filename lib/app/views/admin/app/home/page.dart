@@ -4,7 +4,6 @@ import 'package:gofield/app/views/admin/app/home/components/barChartData.dart';
 // import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/admin/layout/main_admin_schallfold.dart';
 // import 'package:gofield/core/router/app_routes.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:gofield/core/services/auth_service/auth_service.dart';
 import 'package:gofield/core/models/pengguna_model.dart';
 

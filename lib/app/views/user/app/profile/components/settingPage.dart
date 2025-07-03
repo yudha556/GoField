@@ -6,10 +6,6 @@ import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/core/models/pengguna_model.dart';
 import 'package:gofield/core/services/auth_service/auth_service.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
-import 'package:permission_handler/permission_handler.dart';
 
 class Settingpage extends StatelessWidget {
   const Settingpage({super.key});

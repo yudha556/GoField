@@ -26,7 +26,7 @@ class AuthService {
   static void initAuthListener() {
     _supabase.auth.onAuthStateChange.listen((data) {
       print('Auth state changed: ${data.event}');
-      print('User: ${data.session?.user?.email}');
+      print('User: ${data.session?.user.email}');
       _authStateController.add(data);
     });
   }
