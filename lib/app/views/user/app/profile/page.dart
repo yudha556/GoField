@@ -690,7 +690,10 @@ class _ProfileContentState extends State<ProfileContent> {
                     ],
                   ),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      context.go(AppRoutes.login);
+                      // AuthService.logout();
+                    },
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                         vertical: 12,

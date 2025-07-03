@@ -32,6 +32,9 @@ class AppRoutes {
 
   // admin route
   static const String adminPeninjauanPage = '/admin/peninjauan';
-  static const String adminPeninjauanId = '/admin/penjualan/id';
+static const String adminPeninjauanId = '/admin/peninjauan/:id';
+static String adminPeninjauanDetail(String id) => '/admin/peninjauan/$id';
+
   static const String adminProfile = '/admin/profile';
+  
 }

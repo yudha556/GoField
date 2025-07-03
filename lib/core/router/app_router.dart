@@ -26,7 +26,7 @@ import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
     as UserRegisterToOwner;
-import 'package:gofield/app/views/user/app/registerOwner/components/daftarLapangan.dart'
+import 'package:gofield/app/views/user/app/registerOwner/components/daftarOwner.dart'
     as OwnerRegisterForm;
 import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegister.dart'
     as WaitingRegisterToOwner;
@@ -190,12 +190,14 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: AppRoutes.adminPeninjauanId,
-        name: 'peninjauan id',
+        path: '/admin/peninjauan/:id',
+        name: 'peninjauan_id',
         builder: (context, state) {
-          return const IdPeninjauan();
+          final id = state.pathParameters['id']!;
+          return IdPeninjauan(id: id);
         },
       ),
+
       GoRoute(
         path: AppRoutes.adminProfile,
         name: 'admin profile',

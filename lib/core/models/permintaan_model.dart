@@ -1,55 +1,44 @@
 class PermintaanModel {
   final String id;
   final String idPengguna;
-  final String namaLapangan;
-  final String deskripsi;
-  final String jenisOlahraga;
-  final int banyakLapangan;
-  final String nomorTelepon;
-  final String email;
-  final int hargaPerJam;
-  final int kapasitas;
-  final String alamat;
-  final List<String> fasilitas;
-  final String? fasilitasLain;
+  final String? namaPerusahaan;
+  final String? deskripsi;
+  final String? alamatKantor;
+  final String? nomorTelepon;
+  final String? email;
+  final List<String>? urlGambar;
   final String status; // pending / approved / rejected
-  final DateTime tanggal;
+  final DateTime tanggalDibuat;
 
   PermintaanModel({
     required this.id,
     required this.idPengguna,
-    required this.namaLapangan,
-    required this.deskripsi,
-    required this.jenisOlahraga,
-    required this.banyakLapangan,
-    required this.nomorTelepon,
-    required this.email,
-    required this.hargaPerJam,
-    required this.kapasitas,
-    required this.alamat,
-    required this.fasilitas,
-    this.fasilitasLain,
+    this.namaPerusahaan,
+    this.deskripsi,
+    this.alamatKantor,
+    this.nomorTelepon,
+    this.email,
+    this.urlGambar,
     required this.status,
-    required this.tanggal,
+    required this.tanggalDibuat,
   });
 
   factory PermintaanModel.fromJson(Map<String, dynamic> json) {
     return PermintaanModel(
       id: json['id'],
       idPengguna: json['id_pengguna'],
-      namaLapangan: json['nama_lapangan'],
-      deskripsi: json['deskripsi_lapangan'],
-      jenisOlahraga: json['jenis_olahraga'],
-      banyakLapangan: json['banyak_lapangan'],
+      namaPerusahaan: json['nama_perusahaan'],
+      deskripsi: json['deskripsi'],
+      alamatKantor: json['alamat_kantor'],
       nomorTelepon: json['nomor_telepon'],
       email: json['email'],
-      hargaPerJam: json['harga_per_jam'],
-      kapasitas: json['kapasitas'],
-      alamat: json['alamat'],
-      fasilitas: List<String>.from(json['fasilitas']),
-      fasilitasLain: json['fasilitas_lain'],
-      status: json['status'],
-      tanggal: DateTime.parse(json['tanggal']),
+      urlGambar: json['url_gambar'] != null 
+          ? List<String>.from(json['url_gambar']) 
+          : null,
+      status: json['status'] ?? 'pending',
+      tanggalDibuat: json['tanggal_dibuat'] != null
+          ? DateTime.parse(json['tanggal_dibuat'])
+          : DateTime.now(),
     );
   }
 
@@ -57,19 +46,14 @@ class PermintaanModel {
     return {
       'id': id,
       'id_pengguna': idPengguna,
-      'nama_lapangan': namaLapangan,
-      'deskripsi_lapangan': deskripsi,
-      'jenis_olahraga': jenisOlahraga,
-      'banyak_lapangan': banyakLapangan,
+      'nama_perusahaan': namaPerusahaan,
+      'deskripsi': deskripsi,
+      'alamat_kantor': alamatKantor,
       'nomor_telepon': nomorTelepon,
       'email': email,
-      'harga_per_jam': hargaPerJam,
-      'kapasitas': kapasitas,
-      'alamat': alamat,
-      'fasilitas': fasilitas,
-      'fasilitas_lain': fasilitasLain,
+      'url_gambar': urlGambar,
       'status': status,
-      'tanggal': tanggal.toIso8601String(),
+      'tanggal_dibuat': tanggalDibuat.toIso8601String(),
     };
   }
 }
