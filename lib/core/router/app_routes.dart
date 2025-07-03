@@ -36,5 +36,9 @@ static const String adminPeninjauanId = '/admin/peninjauan/:id';
 static String adminPeninjauanDetail(String id) => '/admin/peninjauan/$id';
 
   static const String adminProfile = '/admin/profile';
+
+  // owner route
+  static const String ownerLapanganPage = '/owner/lapangan';
+  static const String tambahLapangan = '/owner/lapangan/tambah';
   
 }

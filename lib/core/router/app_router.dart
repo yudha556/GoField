@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/admin/app/peninjauan/%5Bid%5D/page.dart';
 import 'package:gofield/app/views/admin/app/profile/page.dart';
+import 'package:gofield/app/views/owner/app/lapangan/components/tambahLapangan.dart';
+import 'package:gofield/app/views/owner/app/lapangan/page.dart';
 import 'package:gofield/app/views/splash/page.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/views/auth/register/page.dart';
@@ -205,6 +207,22 @@ class AppRouter {
           return const AdminProfile();
         },
       ),
+
+      // owner route
+      GoRoute(
+        path: AppRoutes.ownerLapanganPage,
+        name: 'Owner Lapangan Page',
+        builder: (context, state) {
+          return const LapanganOwner();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.tambahLapangan,
+        name: 'Tambah Lapangan',
+        builder: (context, state) {
+          return const TambahLapangan();
+        },
+      )
     ],
 
     errorBuilder: (context, state) {

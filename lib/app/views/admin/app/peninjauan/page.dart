@@ -56,7 +56,7 @@ class PeninjauanContent extends StatelessWidget {
               const Text(
                 'Peninjauan Permintaan Pemilik Lapangan',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF0088E8),
                 ),
@@ -67,8 +67,8 @@ class PeninjauanContent extends StatelessWidget {
         
         // Content
         Expanded(
-          child: FutureBuilder<List<PermintaanModel>>(
-            future: PermintaanService.ambilSemuaPermintaan(),
+          child: StreamBuilder<List<PermintaanModel>>(
+            stream: PermintaanService.streamPermintaan(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(

@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:gofield/core/models/permintaan_model.dart';
+import 'dart:async';
 
 class PermintaanService {
   static final supabase = Supabase.instance.client;
@@ -19,6 +20,18 @@ class PermintaanService {
         .map((data) => PermintaanModel.fromJson(data))
         .toList();
   }
+
+  // Real-time subscription
+  static Stream<List<PermintaanModel>> streamPermintaan() {
+  return supabase
+      .from('permintaan_pemilik_lapangan')
+      .stream(primaryKey: ['id'])
+      .order('tanggal_dibuat', ascending: false)
+      .map<List<PermintaanModel>>(
+        (data) => data.map((item) => PermintaanModel.fromJson(item)).toList(),
+      );
+}
+
 
   // Fetch data by id
   static Future<PermintaanModel?> ambilPermintaanById(String id) async {

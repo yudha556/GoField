@@ -264,7 +264,7 @@ class _HomeContentState extends State<HomeContent> {
                               )
                             ],
                           ),
-                          Circleavatar(
+                          CustomCircleAvatar(
                             profileImageUrl: 1,
                             onProfiletap: () {},
                           )
