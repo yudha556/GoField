@@ -40,5 +40,10 @@ static String adminPeninjauanDetail(String id) => '/admin/peninjauan/$id';
   // owner route
   static const String ownerLapanganPage = '/owner/lapangan';
   static const String tambahLapangan = '/owner/lapangan/tambah';
-  
+  static const String tambahLane = '/owner/lapangan/tambah-lane';
+  static const String ownerLapanganDetail = '/owner/lapangan/:id';
+  static String ownerLapanganDetailPath(String id) => '/owner/lapangan/$id';
+  static String tambahLaneWithParams(String lapanganId, String namaLapangan) {
+    return '$tambahLane?lapanganId=$lapanganId&namaLapangan=${Uri.encodeComponent(namaLapangan)}';
+  }
 }

@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/components/buttons/button.dart';
 import 'package:gofield/core/models/permintaan_model.dart';
-import 'package:gofield/core/services/permitaan_service.dart';
+import 'package:gofield/core/services/ownerService/permitaan_service.dart';
 
 class IdPeninjauan extends StatefulWidget {
   final String id;

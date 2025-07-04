@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/admin/layout/main_admin_schallfold.dart';
 import 'package:gofield/core/router/app_routes.dart';
-import 'package:gofield/core/services/permitaan_service.dart';
+import 'package:gofield/core/services/ownerService/permitaan_service.dart';
 import 'package:gofield/core/models/permintaan_model.dart';
 
 class PeninjauanPage extends StatelessWidget {
