@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/core/components/components.dart';
-import 'package:gofield/core/components/search/searchBar.dart';
-import 'package:gofield/core/components/card/cards.dart'; // Import card
+// Import card
 
 class UserHomePage extends StatelessWidget {
   const UserHomePage({super.key});
@@ -264,7 +263,7 @@ class _HomeContentState extends State<HomeContent> {
                               )
                             ],
                           ),
-                          Circleavatar(
+                          CustomCircleAvatar(
                             profileImageUrl: 1,
                             onProfiletap: () {},
                           )

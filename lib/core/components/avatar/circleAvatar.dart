@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class Circleavatar extends StatelessWidget {
+class CustomCircleAvatar extends StatelessWidget {
   final int? profileImageUrl;
   final VoidCallback? onProfiletap;
 
-  const Circleavatar({super.key, this.profileImageUrl, this.onProfiletap});
+  const CustomCircleAvatar({super.key, this.profileImageUrl, this.onProfiletap});
 
   @override
   Widget build(BuildContext context) {

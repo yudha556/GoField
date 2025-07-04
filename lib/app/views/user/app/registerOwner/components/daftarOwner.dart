@@ -5,7 +5,7 @@ import 'package:gofield/core/router/app_routes.dart';
 import 'package:uuid/uuid.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:gofield/core/models/permintaan_model.dart';
-import 'package:gofield/core/services/permitaan_service.dart';
+import 'package:gofield/core/services/ownerService/permitaan_service.dart';
 
 class Daftarlapangan extends StatefulWidget {
   const Daftarlapangan({super.key});

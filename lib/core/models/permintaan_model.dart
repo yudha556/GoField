@@ -7,7 +7,7 @@ class PermintaanModel {
   final String? nomorTelepon;
   final String? email;
   final List<String>? urlGambar;
-  final String status; // pending / approved / rejected
+  final String status; 
   final DateTime tanggalDibuat;
 
   PermintaanModel({

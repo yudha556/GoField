@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:gofield/core/models/permintaan_model.dart';
+import 'dart:async';
 
 class PermintaanService {
   static final supabase = Supabase.instance.client;
@@ -8,7 +9,6 @@ class PermintaanService {
     await supabase.from('permintaan_pemilik_lapangan').insert(model.toJson());
   }
 
-  // fetch data
   static Future<List<PermintaanModel>> ambilSemuaPermintaan() async {
     final response = await supabase
         .from('permintaan_pemilik_lapangan')
@@ -20,7 +20,16 @@ class PermintaanService {
         .toList();
   }
 
-  // Fetch data by id
+  static Stream<List<PermintaanModel>> streamPermintaan() {
+  return supabase
+      .from('permintaan_pemilik_lapangan')
+      .stream(primaryKey: ['id'])
+      .order('tanggal_dibuat', ascending: false)
+      .map<List<PermintaanModel>>(
+        (data) => data.map((item) => PermintaanModel.fromJson(item)).toList(),
+      );
+}
+
   static Future<PermintaanModel?> ambilPermintaanById(String id) async {
     final response = await supabase
         .from('permintaan_pemilik_lapangan')
@@ -36,7 +45,6 @@ class PermintaanService {
   static Future<void> accPermintaan(PermintaanModel permintaan) async {
     final idPengguna = permintaan.idPengguna;
 
-    // 🔍 1. Ambil nama pengguna
     final pengguna = await supabase
         .from('pengguna')
         .select('nama_lengkap')
@@ -45,7 +53,6 @@ class PermintaanService {
 
     final namaLengkap = pengguna?['nama_lengkap'] ?? 'Tanpa Nama';
 
-    // 🏢 2. Insert ke pemilik_lapangan
     await supabase
         .from('pemilik_lapangan')
         .insert({
@@ -55,13 +62,11 @@ class PermintaanService {
           'status_verifikasi': 'terverifikasi',
         });
 
-    // 🔄 3. Update role pengguna
     await supabase
         .from('pengguna')
         .update({'peran': 'pemilik'})
         .eq('id_pengguna', idPengguna);
 
-    // ✅ 4. Update status permintaan
     await supabase
         .from('permintaan_pemilik_lapangan')
         .update({'status': 'approved'})

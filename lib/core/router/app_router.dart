@@ -35,6 +35,12 @@ import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegis
 import 'package:gofield/app/views/admin/app/peninjauan/page.dart' as AdminAcc;
 // import 'package:gofield/app/views/admin/app/peninjauan/[id]/page.dart';
 
+// owner router
+import 'package:gofield/app/views/owner/app/lapangan/components/tambahLane.dart';
+import 'package:gofield/app/views/owner/app/lapangan/components/tambahLapangan.dart';
+import 'package:gofield/app/views/owner/app/lapangan/page.dart';
+import 'package:gofield/app/views/owner/app/lapangan/[id]/page.dart';
+
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.splash,
@@ -203,6 +209,39 @@ class AppRouter {
         name: 'admin profile',
         builder: (context, state) {
           return const AdminProfile();
+        },
+      ),
+
+      // owner route
+      GoRoute(
+        path: AppRoutes.ownerLapanganPage,
+        name: 'Owner Lapangan Page',
+        builder: (context, state) {
+          return const LapanganOwner();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.tambahLapangan,
+        name: 'Tambah Lapangan',
+        builder: (context, state) {
+          return const TambahLapangan();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.tambahLane,
+        name: 'Tambah Lane',
+        builder: (context, state) {
+          final lapanganId = state.uri.queryParameters['lapanganId'];
+          final namaLapangan = state.uri.queryParameters['namaLapangan'];
+
+          return TambahLane(lapanganId: lapanganId, namaLapangan: namaLapangan);
+        },
+      ),
+      GoRoute(
+        path: '/owner/lapangan/:id',
+        name: 'ownerLapanganDetail',
+        builder: (context, state) {
+          return const LapanganId();
         },
       ),
     ],
