@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/components/buttons/button.dart';
 import 'package:gofield/core/models/permintaan_model.dart';
-import 'package:gofield/core/services/ownerService/permitaan_service.dart';
+import 'package:gofield/core/services/permitaan_service.dart';
 
 class IdPeninjauan extends StatefulWidget {
   final String id;
@@ -200,7 +200,6 @@ class _IdPeninjauanState extends State<IdPeninjauan> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Company Information
                       _buildSectionCard(
                         title: 'Informasi Perusahaan',
                         icon: Icons.business,
@@ -223,7 +222,6 @@ class _IdPeninjauanState extends State<IdPeninjauan> {
 
                       const SizedBox(height: 8),
 
-                      // Contact Information
                       _buildSectionCard(
                         title: 'Informasi Kontak',
                         icon: Icons.contact_phone,
@@ -248,7 +246,6 @@ class _IdPeninjauanState extends State<IdPeninjauan> {
 
                       const SizedBox(height: 8),
 
-                      // Address Information
                       if (data.alamatKantor != null) ...[
                         _buildSectionCard(
                           title: 'Alamat Kantor',
@@ -264,7 +261,6 @@ class _IdPeninjauanState extends State<IdPeninjauan> {
                         const SizedBox(height: 8),
                       ],
 
-                      // Documents Section
                       if (data.urlGambar != null && data.urlGambar!.isNotEmpty) ...[
                         _buildSectionCard(
                           title: 'Dokumen Perusahaan',
@@ -312,7 +308,6 @@ class _IdPeninjauanState extends State<IdPeninjauan> {
                 ),
               ),
 
-              // Action Buttons (only show if status is pending)
               if (data.status.toLowerCase() == 'pending') ...[
                 Container(
                   padding: const EdgeInsets.all(16),

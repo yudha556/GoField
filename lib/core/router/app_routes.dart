@@ -24,6 +24,9 @@ class AppRoutes {
   static const String userListPage = '/home/list';
   static const String userTransactionDetail = '/transaksi/id';
   static const String userSettingPage = '/settings';
+  static const String userLapanganDetailPage = '/user/lapangan/:id';
+  static String userLapanganDetailPath(String id) => '/user/lapangan/$id';
+
 
   // register owner
   static const String userRegisterToOwner = '/registerToOwner';
@@ -39,6 +42,7 @@ static String adminPeninjauanDetail(String id) => '/admin/peninjauan/$id';
 
   // owner route
   static const String ownerLapanganPage = '/owner/lapangan';
+  static const String ownerProfilePage = '/owner/profile';
   static const String tambahLapangan = '/owner/lapangan/tambah';
   static const String tambahLane = '/owner/lapangan/tambah-lane';
   static const String ownerLapanganDetail = '/owner/lapangan/:id';

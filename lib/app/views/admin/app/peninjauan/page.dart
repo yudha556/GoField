@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/admin/layout/main_admin_schallfold.dart';
 import 'package:gofield/core/router/app_routes.dart';
-import 'package:gofield/core/services/ownerService/permitaan_service.dart';
+import 'package:gofield/core/services/permitaan_service.dart';
 import 'package:gofield/core/models/permintaan_model.dart';
 
 class PeninjauanPage extends StatelessWidget {
@@ -187,7 +187,6 @@ class PeninjauanContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with status
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -207,7 +206,6 @@ class PeninjauanContent extends StatelessWidget {
               
               const SizedBox(height: 12),
               
-              // Company details
               if (item.email != null) ...[
                 Row(
                   children: [
@@ -278,7 +276,6 @@ class PeninjauanContent extends StatelessWidget {
                 const SizedBox(height: 8),
               ],
               
-              // Date and action
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

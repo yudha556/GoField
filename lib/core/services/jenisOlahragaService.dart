@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../models/jenisOlahraga_model.dart';
+import '../models/jenisOlahraga_model.dart';
 
 class JenisOlahragaService {
   static final _supabase = Supabase.instance.client;

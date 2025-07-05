@@ -21,7 +21,6 @@ class _MyBarChartState extends State<MyBarChart> {
         barTouchData: BarTouchData(
           enabled: true,
           touchTooltipData: BarTouchTooltipData(
-            // tooltipBgColor: Colors.blueGrey,
             tooltipHorizontalAlignment: FLHorizontalAlignment.right,
             tooltipMargin: -10,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {

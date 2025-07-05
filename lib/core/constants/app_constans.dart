@@ -26,8 +26,9 @@ class AppConstants {
   ];
 
   // Status Options
-  static const String statusTersedia = 'tersedia';
-  static const String statusTidakTersedia = 'tidak_tersedia';
+  static const String statusTersedia = 'buka';
+  static const String statusTidakTersedia = 'tutup';
+  static const String statusDalamPerbaikan = 'perbaikan';
   
   // Error Messages
   static const String errorUserNotFound = 'User tidak ditemukan. Silakan login kembali.';

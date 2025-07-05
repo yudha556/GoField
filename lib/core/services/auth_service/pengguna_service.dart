@@ -22,7 +22,6 @@ class PenggunaService {
         'nomor_telepon': nomorTelepon,
         'alamat': alamat,
         'peran': peran.value,
-        // tanggal_daftar dan aktif akan menggunakan default value dari database
       };
 
       final response = await _supabase
@@ -45,7 +44,7 @@ class PenggunaService {
           .from(_tableName)
           .select()
           .eq('id_pengguna', idPengguna)
-          .eq('aktif', true) // Only get active users
+          .eq('aktif', true)
           .single();
 
       return PenggunaModel.fromJson(response);

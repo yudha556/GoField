@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/user/layout/main_user_scaffold.dart';
 import 'package:gofield/core/components/components.dart';
-// Import card
+import 'package:gofield/core/models/pengguna_model.dart';
+import 'package:gofield/core/models/lapangan_model.dart';
+import 'package:gofield/core/services/auth_service/auth_service.dart';
+import 'package:gofield/core/services/lapanganService.dart';
+import 'package:gofield/app/views/user/app/home/components/tabView.dart';
 
 class UserHomePage extends StatelessWidget {
   const UserHomePage({super.key});
@@ -28,78 +33,104 @@ class HomeContent extends StatefulWidget {
 }
 
 class _HomeContentState extends State<HomeContent> {
+  PenggunaModel? pengguna;
+  bool isLoading = true;
   int selectedSportIndex = 0;
+  String? selectedJenisOlahragaId;
+  
+  // Data lapangan
+  List<LapanganModel> featuredLapangan = [];
+  List<LapanganModel> popularLapangan = [];
+  Map<String, double?> lapanganPrices = {};
+  bool isLoadingLapangan = false;
 
-  // Data olahraga
-  final List<String> sportsList = [
-    'Semua',
-    'Futsal',
-    'Badminton',
-    'Basketball',
-    'Volleyball',
-    'Tennis',
-    'Tenis Meja',
-    'Golf',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchPengguna();
+    _loadLapangan();
+  }
 
-  // Data untuk horizontal cards - Featured/Recommended
-  final List<Map<String, String>> featuredCards = [
-    {
-      'name': 'Arena Sport Center',
-      'location': 'Jakarta Selatan',
-      'price': 'Rp 200.000/jam',
-      'image': 'assets/images/featured1.jpg',
-    },
-    {
-      'name': 'Elite Futsal Club',
-      'location': 'Jakarta Pusat',
-      'price': 'Rp 180.000/jam',
-      'image': 'assets/images/featured2.jpg',
-    },
-    {
-      'name': 'Premium Court',
-      'location': 'Jakarta Utara',
-      'price': 'Rp 250.000/jam',
-      'image': 'assets/images/featured3.jpg',
-    },
-    {
-      'name': 'Grand Sport Arena',
-      'location': 'Jakarta Barat',
-      'price': 'Rp 220.000/jam',
-      'image': 'assets/images/featured4.jpg',
-    },
-  ];
+  Future<void> _fetchPengguna() async {
+    final result = await AuthService.getCurrentPengguna();
+    setState(() {
+      pengguna = result;
+      isLoading = false;
+    });
+  }
 
-  // Data untuk grid cards - Popular
-  final List<Map<String, String>> popularCards = [
-    {
-      'name': 'Lapangan Futsal A',
-      'location': 'Jakarta Selatan',
-      'price': 'Rp 150.000/jam',
-      'image': 'assets/images/field1.jpg',
-    },
-    {
-      'name': 'Badminton Court B',
-      'location': 'Jakarta Pusat',
-      'price': 'Rp 80.000/jam',
-      'image': 'assets/images/field2.jpg',
-    },
-    {
-      'name': 'Basketball Arena',
-      'location': 'Jakarta Utara',
-      'price': 'Rp 200.000/jam',
-      'image': 'assets/images/field3.jpg',
-    },
-    {
-      'name': 'Tennis Court',
-      'location': 'Jakarta Barat',
-      'price': 'Rp 120.000/jam',
-      'image': 'assets/images/field4.jpg',
-    },
-  ];
+  Future<void> _loadLapangan({String? jenisOlahragaId}) async {
+    setState(() {
+      isLoadingLapangan = true;
+    });
 
-  // Widget untuk membuat card dengan design yang sama
-  Widget _buildFieldCard(Map<String, String> field, {double? width}) {
+    try {
+      final lapanganList = await LapanganService.ambilSemuaLapangan(
+        jenisOlahragaId: jenisOlahragaId,
+      );
+
+      await _loadPricesForLapangan(lapanganList);
+
+      if (mounted) {
+        setState(() {
+          featuredLapangan = lapanganList.take(4).toList();
+          popularLapangan = lapanganList.skip(4).take(6).toList();
+          isLoadingLapangan = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading lapangan: $e');
+      if (mounted) {
+        setState(() {
+          isLoadingLapangan = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadPricesForLapangan(List<LapanganModel> lapanganList) async {
+    for (var lapangan in lapanganList) {
+      if (lapangan.id != null) {
+        try {
+          final price = await LapanganService.getLowestPriceByLapangan(lapangan.id!);
+          lapanganPrices[lapangan.id!] = price;
+        } catch (e) {
+          print('Error loading price for lapangan ${lapangan.id}: $e');
+          lapanganPrices[lapangan.id!] = null;
+        }
+      }
+    }
+  }
+
+  void _onTabChanged(int index, String? jenisOlahragaId) {
+    setState(() {
+      selectedSportIndex = index;
+      selectedJenisOlahragaId = jenisOlahragaId;
+    });
+    _loadLapangan(jenisOlahragaId: jenisOlahragaId);
+  }
+
+  String _getFirstName(String? namaLengkap) {
+    if (namaLengkap == null || namaLengkap.isEmpty) {
+      return 'Pengguna';
+    }
+    return namaLengkap.split(' ').first;
+  }
+
+  String _formatCurrency(double amount) {
+    return amount.toInt().toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
+  void _navigateToDetail(String lapanganId) {
+    context.go('/user/lapangan/$lapanganId');
+  }
+
+  Widget _buildFieldCard(LapanganModel field, {double? width}) {
+    final lowestPrice = lapanganPrices[field.id];
+
     return SizedBox(
       width: width,
       child: GlobalCard(
@@ -111,9 +142,8 @@ class _HomeContentState extends State<HomeContent> {
           borderRadius: BorderRadius.circular(12),
           child: Stack(
             children: [
-              // Background Image - Full container dengan aspect ratio 1:1
               AspectRatio(
-                aspectRatio: 1.0, // Aspect ratio 1:1
+                aspectRatio: 1.0,
                 child: Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -125,13 +155,49 @@ class _HomeContentState extends State<HomeContent> {
                     size: 60,
                     color: Colors.grey,
                   ),
-                  // Uncomment ini jika ada gambar asli:
-                  // child: Image.asset(
-                  //   field['image']!,
-                  //   fit: BoxFit.cover,
-                  //   width: double.infinity,
-                  //   height: double.infinity,
-                  // ),
+                ),
+              ),
+
+              // Price Badge
+              if (lowestPrice != null)
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0088E8).withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Rp ${_formatCurrency(lowestPrice)}/jam',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+              // Status Badge
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Tersedia',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
               
@@ -152,7 +218,6 @@ class _HomeContentState extends State<HomeContent> {
                 ),
               ),
               
-              // Text overlay di bagian bawah
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -163,9 +228,8 @@ class _HomeContentState extends State<HomeContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Field name
                       Text(
-                        field['name']!,
+                        field.namaLapangan,
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -176,9 +240,8 @@ class _HomeContentState extends State<HomeContent> {
                       ),
                       const SizedBox(height: 2),
                       
-                      // Location
                       Text(
-                        field['location']!,
+                        '${field.kecamatan ?? ''}, ${field.kabupaten ?? ''}',
                         style: const TextStyle(
                           fontSize: 10,
                           color: Colors.white70,
@@ -188,16 +251,39 @@ class _HomeContentState extends State<HomeContent> {
                       ),
                       const SizedBox(height: 2),
                       
-                      // Price
-                      Text(
-                        field['price']!,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${field.kapasitas} orang',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (lowestPrice != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Mulai Rp ${_formatCurrency(lowestPrice)}',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -207,6 +293,73 @@ class _HomeContentState extends State<HomeContent> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLoadingCards({required int count, double? width}) {
+    return SizedBox(
+      height: width ?? 160,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: count,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.only(right: 16),
+            width: width ?? 160,
+            child: GlobalCard(
+              padding: EdgeInsets.zero,
+              borderRadius: BorderRadius.circular(12),
+              elevation: 3,
+              isResponsive: false,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0088E8)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoadingGrid({required int count}) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 1.0,
+      ),
+      itemCount: count,
+      itemBuilder: (context, index) {
+        return GlobalCard(
+          padding: EdgeInsets.zero,
+          borderRadius: BorderRadius.circular(12),
+          elevation: 3,
+          isResponsive: false,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              color: Colors.grey[300],
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0088E8)),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -244,9 +397,9 @@ class _HomeContentState extends State<HomeContent> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Hai, Jean',
-                                style: TextStyle(
+                              Text(
+                                'Hai, ${_getFirstName(pengguna?.namaLengkap)}',
+                                style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w800,
                                   color: Colors.black
@@ -282,7 +435,7 @@ class _HomeContentState extends State<HomeContent> {
                       ),
                       const SizedBox(height: 20),
                       
-                      // Sports Selection Section
+                      // Sports Selection Section dengan TabView
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -299,49 +452,9 @@ class _HomeContentState extends State<HomeContent> {
                           ),
                           const SizedBox(height: 12),
                           
-                          // Horizontal Sports List
-                          SizedBox(
-                            height: 40,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: sportsList.length,
-                              padding: const EdgeInsets.symmetric(horizontal: 4),
-                              itemBuilder: (context, index) {
-                                final sport = sportsList[index];
-                                final isSelected = selectedSportIndex == index;
-                                
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectedSportIndex = index;
-                                    });
-                                    print('Selected: $sport');
-                                  },
-                                  child: Container(
-                                    margin: const EdgeInsets.only(right: 12),
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: isSelected 
-                                          ? const Color(0xFF0088E8)
-                                          : Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        sport,
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: isSelected 
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
+                          // TabView untuk filter jenis olahraga
+                          TabViewHome(
+                            onTabChanged: _onTabChanged,
                           ),
                         ],
                       ),
@@ -354,37 +467,70 @@ class _HomeContentState extends State<HomeContent> {
           
           // Featured Cards Section - Horizontal Scroll
           Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0), // Kurangi top padding
+            padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Rekomendasi Untuk Anda',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Rekomendasi Untuk Anda',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    if (isLoadingLapangan)
+                      const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0088E8)),
+                        ),
+                      ),
+                  ],
                 ),
-                const SizedBox(height: 12), // Kurangi spacing
+                const SizedBox(height: 12),
                 
                 // Horizontal Cards
-                SizedBox(
-                  height: 160, // Fixed height untuk horizontal scroll
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: featuredCards.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    itemBuilder: (context, index) {
-                      final field = featuredCards[index];
-                      
-                      return Container(
-                        margin: const EdgeInsets.only(right: 16),
-                        child: _buildFieldCard(field, width: 160), // Width sama dengan height untuk 1:1
-                      );
-                    },
+                if (isLoadingLapangan)
+                  _buildLoadingCards(count: 4, width: 160)
+                else if (featuredLapangan.isEmpty)
+                  Container(
+                    height: 160,
+                    child: const Center(
+                      child: Text(
+                        'Tidak ada lapangan yang tersedia',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 160,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: featuredLapangan.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      itemBuilder: (context, index) {
+                        final field = featuredLapangan[index];
+                        
+                        return Container(
+                          margin: const EdgeInsets.only(right: 16),
+                          child: GestureDetector(
+                            onTap: () => _navigateToDetail(field.id!),
+                            child: _buildFieldCard(field, width: 160),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -395,32 +541,65 @@ class _HomeContentState extends State<HomeContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Lapangan Populer',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Lapangan Populer',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    if (isLoadingLapangan)
+                      const SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0088E8)),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 
                 // Grid Cards
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.0, // Rasio 1:1 untuk ukuran persegi
+                if (isLoadingLapangan)
+                  _buildLoadingGrid(count: 4)
+                else if (popularLapangan.isEmpty)
+                  Container(
+                    height: 200,
+                    child: const Center(
+                      child: Text(
+                        'Tidak ada lapangan populer yang tersedia',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 1.0,
+                    ),
+                    itemCount: popularLapangan.length,
+                    itemBuilder: (context, index) {
+                      final field = popularLapangan[index];
+                      return GestureDetector(
+                        onTap: () => _navigateToDetail(field.id!),
+                        child: _buildFieldCard(field),
+                      );
+                    },
                   ),
-                  itemCount: popularCards.length,
-                  itemBuilder: (context, index) {
-                    final field = popularCards[index];
-                    return _buildFieldCard(field);
-                  },
-                ),
               ],
             ),
           ),
@@ -431,3 +610,4 @@ class _HomeContentState extends State<HomeContent> {
     );
   }
 }
+

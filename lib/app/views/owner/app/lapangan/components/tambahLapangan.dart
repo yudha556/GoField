@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/models/lapangan_model.dart';
-import 'package:gofield/core/services/ownerService/lapanganService.dart';
+import 'package:gofield/core/services/lapanganService.dart';
 import 'package:gofield/core/constants/app_constans.dart';
 import 'package:gofield/core/utils/validators.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -462,7 +462,7 @@ class _TambahLapanganState extends State<TambahLapangan> {
         //   _hargaController.text,
         // ),
         kapasitas: int.parse(_kapasitasController.text),
-        status: _statusLapangan
+        statusOperasional: _statusLapangan
             ? AppConstants.statusTersedia
             : AppConstants.statusTidakTersedia, 
         // urlGambar: [],

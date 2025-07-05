@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../models/lane_model.dart';
+import '../models/lane_model.dart';
 
 class LaneService {
   static final _supabase = Supabase.instance.client;
@@ -12,16 +12,12 @@ class LaneService {
         print("Insert gagal: response kosong");
         return false;
       }
-
-      print("Insert lane berhasil: ${res['id_lane']}");
       return true;
     } catch (e) {
-      print('Gagal menambah lane: ${e.toString()}');
       return false;
     }
   }
 
-  // Ganti semua 'lane' menjadi 'lane_lapangan'
 static Future<bool> tambahMultipleLanes(List<LaneModel> lanes) async {
   try {
     final List<Map<String, dynamic>> laneData = lanes.map((lane) => lane.toJson()).toList();
@@ -32,7 +28,6 @@ static Future<bool> tambahMultipleLanes(List<LaneModel> lanes) async {
     
     return true;
   } catch (e) {
-    print('Error saving lanes: $e');
     throw Exception('Gagal menyimpan lanes: ${e.toString()}');
   }
 }
@@ -52,8 +47,6 @@ static Future<bool> tambahMultipleLanes(List<LaneModel> lanes) async {
   }
 }
 
-
-  // Tambahkan method untuk mengambil lane dengan join ke jenis olahraga
   static Future<List<Map<String, dynamic>>> ambilLaneWithJenisOlahraga(String idLapangan) async {
     try {
       final res = await _supabase
@@ -105,7 +98,6 @@ static Future<bool> tambahMultipleLanes(List<LaneModel> lanes) async {
     }
   }
 
-  // Method untuk validasi 
   static Future<bool> validateLaneData(LaneModel model) async {
     try {
       final lapanganExists = await _supabase

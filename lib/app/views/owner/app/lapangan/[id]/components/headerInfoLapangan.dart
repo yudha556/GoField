@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gofield/core/models/lapanganDetail_model.dart';
+import 'package:gofield/core/models/lapangan_model.dart';
 import 'package:gofield/core/constants/app_constans.dart';
 
 class HeaderInfoLapangan extends StatelessWidget {
   final LapanganDetailModel lapangan;
   final VoidCallback? onEdit;
 
-  const HeaderInfoLapangan({
-    super.key,
-    required this.lapangan,
-    this.onEdit,
-  });
+  const HeaderInfoLapangan({super.key, required this.lapangan, this.onEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +60,9 @@ class HeaderInfoLapangan extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(lapangan.status).withOpacity(0.2),
+                          color: _getStatusColor(
+                            lapangan.status,
+                          ).withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
                             color: _getStatusColor(lapangan.status),
@@ -125,11 +124,7 @@ class HeaderInfoLapangan extends StatelessWidget {
                 ],
 
                 // Alamat
-                _buildInfoRow(
-                  Icons.location_on,
-                  'Alamat',
-                  _buildFullAddress(),
-                ),
+                _buildInfoRow(Icons.location_on, 'Alamat', _buildFullAddress()),
                 const SizedBox(height: 16),
 
                 // Kapasitas
@@ -141,7 +136,8 @@ class HeaderInfoLapangan extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Fasilitas
-                if (lapangan.fasilitas != null && lapangan.fasilitas!.isNotEmpty)
+                if (lapangan.fasilitas != null &&
+                    lapangan.fasilitas!.isNotEmpty)
                   _buildFasilitasSection(),
               ],
             ),
@@ -179,10 +175,7 @@ class HeaderInfoLapangan extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 value,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
             ],
           ),
@@ -193,7 +186,7 @@ class HeaderInfoLapangan extends StatelessWidget {
 
   Widget _buildFasilitasSection() {
     final fasilitasList = lapangan.fasilitas!['fasilitas'] as List<dynamic>?;
-    
+
     if (fasilitasList == null || fasilitasList.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -253,7 +246,7 @@ class HeaderInfoLapangan extends StatelessWidget {
 
   String _buildFullAddress() {
     List<String> addressParts = [lapangan.alamat];
-    
+
     if (lapangan.kecamatan != null && lapangan.kecamatan!.isNotEmpty) {
       addressParts.add(lapangan.kecamatan!);
     }
@@ -263,7 +256,7 @@ class HeaderInfoLapangan extends StatelessWidget {
     if (lapangan.provinsi != null && lapangan.provinsi!.isNotEmpty) {
       addressParts.add(lapangan.provinsi!);
     }
-    
+
     return addressParts.join(', ');
   }
 
@@ -292,11 +285,11 @@ class HeaderInfoLapangan extends StatelessWidget {
   String _getStatusText(String status) {
     switch (status) {
       case AppConstants.statusTersedia:
-        return 'Tersedia';
+        return 'Buka';
       case AppConstants.statusTidakTersedia:
-        return 'Tidak Tersedia';
+        return 'Tutup';
       default:
-        return 'Unknown';
+        return 'perbaikan';
     }
   }
 }

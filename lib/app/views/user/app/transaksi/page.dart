@@ -100,11 +100,6 @@ class TransaksiContent extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Icon(
-          //   Icons.calendar_today,
-          //   size: 16,
-          //   color: Colors.grey.shade600,
-          // ),
           const SizedBox(width: 8),
           Text(
             date,
@@ -155,21 +150,6 @@ class TransaksiContent extends StatelessWidget {
     );
   }
 
-  // Widget _buildFieldIcon(Map<String, dynamic> transaction) {
-  //   return Container(
-  //     width: 48,
-  //     height: 48,
-  //     decoration: BoxDecoration(
-  //       color: _getStatusColorFromAlert(transaction['status']).withOpacity(0.1),
-  //       borderRadius: BorderRadius.circular(12),
-  //     ),
-  //     child: Icon(
-  //       _getFieldIcon(transaction['fieldName']),
-  //       color: _getStatusColorFromAlert(transaction['status']),
-  //       size: 24,
-  //     ),
-  //   );
-  // }
 
   Widget _buildTransactionInfo(Map<String, dynamic> transaction) {
     return Expanded(
@@ -229,35 +209,6 @@ class TransaksiContent extends StatelessWidget {
       ],
     );
   }
-
-  // Color _getStatusColorFromAlert(AlertStatus status) {
-  //   switch (status) {
-  //     case AlertStatus.success:
-  //       return Colors.green.shade700;
-  //     case AlertStatus.pending:
-  //       return Colors.orange.shade700;
-  //     case AlertStatus.rejected:
-  //       return Colors.red.shade700;
-  //     case AlertStatus.cancelled:
-  //       return Colors.grey.shade600;
-  //     case AlertStatus.warning:
-  //       return Colors.amber.shade700;
-  //     case AlertStatus.info:
-  //       return Colors.blue.shade700;
-  //   }
-  // }
-
-  // IconData _getFieldIcon(String fieldName) {
-  //   final String normalizedFieldName = fieldName.toLowerCase();
-  //   if (normalizedFieldName.contains('futsal')) {
-  //     return Icons.sports_soccer;
-  //   } else if (normalizedFieldName.contains('badminton') || normalizedFieldName.contains('tenis')) {
-  //     return Icons.sports_tennis;
-  //   } else if (normalizedFieldName.contains('basket')) {
-  //     return Icons.sports_basketball;
-  //   }
-  //   return Icons.sports;
-  // }
 
   List<Map<String, dynamic>> _getGroupedTransactions() {
     return [

@@ -1,273 +1,304 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/user/app/home/components/tabView.dart';
+import 'package:gofield/core/models/lapangan_model.dart';
+import 'package:gofield/core/services/lapanganService.dart';
 import 'package:gofield/core/components/components.dart';
-import 'package:gofield/core/router/app_routes.dart';
+import 'package:go_router/go_router.dart';
 
-class ListPage extends StatefulWidget {
-  const ListPage({super.key});
+class LapanganListView extends StatefulWidget {
+  const LapanganListView({super.key});
 
   @override
-  State<ListPage> createState() => _ListPageState();
+  State<LapanganListView> createState() => _LapanganListViewState();
 }
 
-class _ListPageState extends State<ListPage> {
-  final FocusNode _focusNode = FocusNode();
-  bool _isSearchFocused = false;
+class _LapanganListViewState extends State<LapanganListView> {
+  List<LapanganModel> lapanganList = [];
+  Map<String, double?> lapanganPrices = {};
+  bool isLoading = false;
+  int selectedTabIndex = 0;
+  String? selectedJenisOlahragaId;
 
   @override
   void initState() {
     super.initState();
-    _focusNode.addListener(() {
-      setState(() {
-        _isSearchFocused = _focusNode.hasFocus;
-      });
+    _loadLapangan();
+  }
+
+  Future<void> _loadLapangan({String? jenisOlahragaId}) async {
+    setState(() {
+      isLoading = true;
     });
+
+    try {
+      final lapangan = await LapanganService.ambilSemuaLapangan(
+        jenisOlahragaId: jenisOlahragaId,
+      );
+
+      await _loadPricesForLapangan(lapangan);
+
+      if (mounted) {
+        setState(() {
+          lapanganList = lapangan;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading lapangan: $e');
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
+  Future<void> _loadPricesForLapangan(List<LapanganModel> lapangan) async {
+    for (var field in lapangan) {
+      if (field.id != null) {
+        try {
+          final price = await LapanganService.getLowestPriceByLapangan(field.id!);
+          lapanganPrices[field.id!] = price;
+        } catch (e) {
+          print('Error loading price for lapangan ${field.id}: $e');
+          lapanganPrices[field.id!] = null;
+        }
+      }
+    }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header + Search
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
+  void _onTabChanged(int index, String? jenisOlahragaId) {
+    setState(() {
+      selectedTabIndex = index;
+      selectedJenisOlahragaId = jenisOlahragaId;
+    });
+    _loadLapangan(jenisOlahragaId: jenisOlahragaId);
+  }
+
+  String _formatCurrency(double amount) {
+    return amount.toInt().toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+
+  void _navigateToDetail(String lapanganId) {
+    context.go('/user/lapangan/$lapanganId');
+  }
+
+  Widget _buildLapanganCard(LapanganModel lapangan) {
+    final lowestPrice = lapanganPrices[lapangan.id];
+
+    return GlobalCard(
+      padding: EdgeInsets.zero,
+      borderRadius: BorderRadius.circular(12),
+      elevation: 3,
+      isResponsive: false,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Stack(
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                ),
+                child: const Icon(
+                  Icons.sports_soccer,
+                  size: 60,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+
+            // Price Badge
+            if (lowestPrice != null)
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0088E8).withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Rp ${_formatCurrency(lowestPrice)}/jam',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+
+            // Status Badge
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'Tersedia',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+
+            // Overlay gradient
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.7),
+                    ],
+                    stops: const [0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+
+            // Text overlay
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Animated space untuk arrow back
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      width: _isSearchFocused ? 0 : 40,
-                      child: AnimatedOpacity(
-                        duration: Duration(milliseconds: 200),
-                        opacity: _isSearchFocused ? 0 : 1,
-                        child: GestureDetector(
-                          onTap: () => context.go(AppRoutes.userDashboard),
-                          child: Container(
-                            padding: EdgeInsets.all(8),
+                    Text(
+                      lapangan.namaLapangan,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${lapangan.kecamatan ?? ''}, ${lapangan.kabupaten ?? ''}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white70,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${lapangan.kapasitas} orang',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        if (lowestPrice != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.white.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.arrow_back, size: 20),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-
-                    // Search bar
-                    Expanded(
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        height: 42,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(21),
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        child: TextField(
-                          focusNode: _focusNode,
-                          decoration: InputDecoration(
-                            hintText: 'Cari lapangan...',
-                            hintStyle: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 14,
-                            ),
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: Colors.grey.shade600,
-                              size: 20,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
+                            child: Text(
+                              'Mulai Rp ${_formatCurrency(lowestPrice)}',
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                        ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
               ),
-
-              // Tab View
-              TabViewHome(onTabChanged: (index) {}),
-
-              // GridView + Blur
-              Expanded(
-                child: Stack(
-                  children: [
-                    _buildGridContent(),
-
-                    // Blur layer
-                    IgnorePointer(
-                      ignoring: !_isSearchFocused,
-                      child: AnimatedOpacity(
-                        duration: Duration(milliseconds: 300),
-                        opacity: _isSearchFocused ? 1.0 : 0.0,
-                        child: ClipRect(
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                            child: Container(
-                              color: Colors.black.withOpacity(0.1),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildGridContent() {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: GridView.builder(
-        itemCount: 10,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 0.67,
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TabViewHome(
+          onTabChanged: _onTabChanged, 
         ),
-        itemBuilder: (context, index) {
-          return GlobalCard(
-            padding: const EdgeInsets.all(8),
-            backgroundColor: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AspectRatio(
-                  aspectRatio: 1.0,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.asset(
-                      'assets/images/contoh.jpg',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  'Glagah Futsal',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              SizedBox(width: 4),
-                              Icon(Icons.favorite_border, size: 16),
-                            ],
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Rp 10.000',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.star,
-                                size: 16,
-                                color: Colors.yellow[600],
-                              ),
-                              SizedBox(width: 2),
-                              Text(
-                                '5.0',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              SizedBox(width: 4),
-                              Icon(Icons.circle, size: 3, color: Colors.grey),
-                              SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  '1rb Pemesanan',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Glagah Team',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          SizedBox(width: 4),
-                          Icon(Icons.pin_drop_outlined, size: 12),
-                          SizedBox(width: 2),
-                          Text(
-                            '0.1 Km',
-                            style: TextStyle(fontSize: 11, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+        
+        const SizedBox(height: 16),
+        
+        // Content
+        if (isLoading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0088E8)),
+              ),
             ),
-          );
-        },
-      ),
+          )
+        else if (lapanganList.isEmpty)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(32.0),
+              child: Text(
+                'Tidak ada lapangan yang tersedia',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: lapanganList.length,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemBuilder: (context, index) {
+              final lapangan = lapanganList[index];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: GestureDetector(
+                  onTap: () => _navigateToDetail(lapangan.id!),
+                  child: _buildLapanganCard(lapangan),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }

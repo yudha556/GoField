@@ -20,8 +20,9 @@ import 'package:gofield/app/views/user/app/home/components/list.dart'
     as userListPage;
 import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
     as UserTransaksiDetail;
-import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
-    as UserSettingPage;
+// import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
+    // as UserSettingPage;
+import 'package:gofield/app/views/user/app/home/[id]/page.dart';
 
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
@@ -33,13 +34,13 @@ import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegis
 
 // admin router
 import 'package:gofield/app/views/admin/app/peninjauan/page.dart' as AdminAcc;
-// import 'package:gofield/app/views/admin/app/peninjauan/[id]/page.dart';
 
 // owner router
 import 'package:gofield/app/views/owner/app/lapangan/components/tambahLane.dart';
 import 'package:gofield/app/views/owner/app/lapangan/components/tambahLapangan.dart';
 import 'package:gofield/app/views/owner/app/lapangan/page.dart';
 import 'package:gofield/app/views/owner/app/lapangan/[id]/page.dart';
+import 'package:gofield/app/views/owner/app/profile/page.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -146,7 +147,7 @@ class AppRouter {
         name: 'List Id',
         builder: (context, state) {
           print('Builder List Page');
-          return const userListPage.ListPage();
+          return const userListPage.LapanganListView();
         },
       ),
       GoRoute(
@@ -156,13 +157,13 @@ class AppRouter {
           return const UserTransaksiDetail.TransactionDetail();
         },
       ),
-      GoRoute(
-        path: AppRoutes.userSettingPage,
-        name: 'Settings',
-        builder: (context, state) {
-          return const UserSettingPage.Settingpage();
-        },
-      ),
+      // GoRoute(
+      //   path: AppRoutes.userSettingPage,
+      //   name: 'Settings',
+      //   builder: (context, state) {
+      //     return const UserSettingPage.Settingpage();
+      //   },
+      // ),
 
       // user register ke owner
       GoRoute(
@@ -184,6 +185,14 @@ class AppRouter {
         name: 'waiting Register Page',
         builder: (context, state) {
           return const WaitingRegisterToOwner.WaitingPage();
+        },
+      ),
+
+      GoRoute(
+        path: '/user/lapangan/:id',
+        name: 'userLapanganDetail',
+        builder: (context, state) {
+          return const DetailLapangan();
         },
       ),
 
@@ -218,6 +227,13 @@ class AppRouter {
         name: 'Owner Lapangan Page',
         builder: (context, state) {
           return const LapanganOwner();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.ownerProfilePage,
+        name: 'Owner Profile Page',
+        builder: (context, state) {
+          return const OwnerProfile();
         },
       ),
       GoRoute(
