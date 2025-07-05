@@ -26,6 +26,7 @@ class AppRoutes {
   static const String userSettingPage = '/settings';
   static const String userLapanganDetailPage = '/user/lapangan/:id';
   static String userLapanganDetailPath(String id) => '/user/lapangan/$id';
+  static const String userPaymentPage = '/user/payment';
 
 
   // register owner

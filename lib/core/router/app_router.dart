@@ -23,6 +23,7 @@ import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
 // import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
     // as UserSettingPage;
 import 'package:gofield/app/views/user/app/home/[id]/page.dart';
+import 'package:gofield/app/views/user/app/payment/page.dart';
 
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
@@ -218,6 +219,13 @@ class AppRouter {
         name: 'admin profile',
         builder: (context, state) {
           return const AdminProfile();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.userPaymentPage,
+        name: 'User Payment Page',
+        builder: (context, state) {
+          return const PaymentPage();
         },
       ),
 
