@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gofield/core/models/lapanganDetail_model.dart';
-import 'package:gofield/core/models/lapangan_model.dart';
 import 'package:gofield/core/constants/app_constans.dart';
 
 class HeaderInfoLapangan extends StatelessWidget {
