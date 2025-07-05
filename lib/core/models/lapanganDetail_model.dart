@@ -50,7 +50,7 @@ class LapanganDetailModel {
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
       kapasitas: json['kapasitas'] ?? 0,
-      status: json['status'] ?? '',
+      status: json['status_lapangan'] ?? '',
       fasilitas: json['fasilitas'],
       urlGambar: json['url_gambar'] != null 
           ? List<String>.from(json['url_gambar']) 
@@ -76,7 +76,7 @@ class LapanganDetailModel {
       'latitude': latitude,
       'longitude': longitude,
       'kapasitas': kapasitas,
-      'status': status,
+      'status_lapangan': status,
       'fasilitas': fasilitas,
       'url_gambar': urlGambar,
       'created_at': createdAt.toIso8601String(),

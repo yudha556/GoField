@@ -1,7 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:gofield/core/services/auth_service/pengguna_service.dart';
 import 'package:gofield/core/models/pengguna_model.dart';
-// import 'package:url_launcher/url_launcher.dart';
 
 class GoogleAuthService {
   static final _supabase = Supabase.instance.client;
@@ -9,7 +8,6 @@ class GoogleAuthService {
   // Sign in with Google using Supabase OAuth
   static Future<GoogleSignInResult> signInWithGoogle({bool isRegister = false}) async {
     try {
-      // Method yang benar untuk Supabase OAuth
       final bool result = await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: 'io.supabase.gofield://login-callback/',
@@ -22,7 +20,6 @@ class GoogleAuthService {
         );
       }
 
-      // Tunggu sampai user kembali dari OAuth flow
       await _waitForAuthStateChange();
 
       final user = _supabase.auth.currentUser;
@@ -38,7 +35,6 @@ class GoogleAuthService {
       final existingPengguna = await PenggunaService.getPenggunaById(user.id);
       
       if (existingPengguna == null) {
-        // Create new pengguna record for Google user
         final displayName = user.userMetadata?['full_name'] as String? ?? 
                            user.userMetadata?['name'] as String? ?? 
                            user.email?.split('@')[0] ?? 
@@ -82,7 +78,6 @@ class GoogleAuthService {
   // Wait for auth state change after OAuth
   static Future<void> _waitForAuthStateChange() async {
     try {
-      // Tunggu maksimal 30 detik untuk auth state change
       await _supabase.auth.onAuthStateChange
           .where((state) => 
               state.event == AuthChangeEvent.signedIn || 

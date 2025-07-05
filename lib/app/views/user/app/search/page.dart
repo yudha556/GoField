@@ -123,28 +123,23 @@ class _SearchContentState extends State<SearchContent>
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Main content dengan blur
           Column(
             children: [
               Container(
                 height: 80, 
                 color: Colors.transparent,
               ),
-
-              // Content area yang akan di-blur
               Expanded(
                 child: AnimatedBuilder(
                   animation: _blurAnimation,
                   builder: (context, child) {
                     return Stack(
                       children: [
-                        // Content area
                         SingleChildScrollView(
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Greeting section
                               Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(20),
@@ -202,7 +197,6 @@ class _SearchContentState extends State<SearchContent>
 
                               const SizedBox(height: 24),
 
-                              // Popular categories
                               Text(
                                 'Kategori Populer',
                                 style: TextStyle(
@@ -230,7 +224,6 @@ class _SearchContentState extends State<SearchContent>
 
                               const SizedBox(height: 24),
 
-                              // Search history section
                               if (_searchHistory.isNotEmpty) ...[
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,7 +255,6 @@ class _SearchContentState extends State<SearchContent>
                                 ),
                                 const SizedBox(height: 8),
 
-                                // Search history list
                                 ListView.separated(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
@@ -280,7 +272,6 @@ class _SearchContentState extends State<SearchContent>
                           ),
                         ),
 
-                        // Blur overlay (HANYA untuk konten)
                         if (_blurAnimation.value > 0)
                           Positioned.fill(
                             child: GestureDetector(
@@ -304,7 +295,6 @@ class _SearchContentState extends State<SearchContent>
             ],
           ),
 
-          // Header dengan search bar (TIDAK ikut blur - positioned di atas)
           Positioned(
             top: 0,
             left: 0,

@@ -84,7 +84,6 @@ class PromoContent extends StatelessWidget {
 
             SizedBox(height: 4,),
             TabViewPromo(onTabChanged: (index) {
-              // content disini
               },
             ),
             SizedBox(height: 24,),

@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../models/lapangan_model.dart';
+import '../models/lapangan_model.dart';
 import 'package:gofield/core/models/lapanganDetail_model.dart';
 
 class LapanganService {
@@ -78,35 +78,44 @@ class LapanganService {
       final response = await _supabase
           .from('lapangan')
           .select('''
-            *,
+            id_lapangan,
+            id_pemilik,
+            nama_lapangan,
+            deskripsi_lapangan,
+            alamat_lapangan,
+            kapasitas_pemain,
+            status_lapangan,
+            kecamatan,
+            kabupaten,
+            provinsi,
+            latitude,
+            longitude,
+            fasilitas,
+            created_at,
+            updated_at,
             lanes:lane_lapangan(
-              *,
+              id_lane,
+              nama_lane,
+              deskripsi,
+              kapasitas_pemain,
+              harga_per_jam,
+              aktif,
+              created_at,
+              updated_at,
               jenis_olahraga:jenis_olahraga(nama_jenis)
             )
           ''')
           .eq('id_lapangan', idLapangan)
           .single();
 
-      print('Detail lapangan response: $response');
-
-      if (response['lanes'] != null) {
-        for (var lane in response['lanes']) {
-          if (lane['jenis_olahraga'] != null) {
-            lane['jenis_olahraga_nama'] = lane['jenis_olahraga']['nama_jenis'];
-          }
-        }
-      }
-
       return LapanganDetailModel.fromJson(response);
     } catch (e) {
-      print('Error fetching detail lapangan: $e');
       throw Exception('Gagal mengambil detail lapangan: ${e.toString()}');
     }
   }
 
   static Future<bool> updateStatusLapangan(String idLapangan, String status) async {
     try {
-      print('Updating lapangan status: $idLapangan to $status');
 
       await _supabase
           .from('lapangan')
@@ -116,18 +125,14 @@ class LapanganService {
           })
           .eq('id_lapangan', idLapangan);
 
-      print('Lapangan status updated successfully');
       return true;
     } catch (e) {
-      print('Error updating lapangan status: $e');
       throw Exception('Gagal mengupdate status lapangan: ${e.toString()}');
     }
   }
 
   static Future<bool> updateLapanganData(String idLapangan, Map<String, dynamic> data) async {
     try {
-      print('Updating lapangan: $idLapangan with data: $data');
-
       data['updated_at'] = DateTime.now().toIso8601String();
 
       await _supabase
@@ -135,10 +140,8 @@ class LapanganService {
           .update(data)
           .eq('id_lapangan', idLapangan);
 
-      print('Lapangan updated successfully');
       return true;
     } catch (e) {
-      print('Error updating lapangan: $e');
       throw Exception('Gagal mengupdate lapangan: ${e.toString()}');
     }
   }
@@ -156,10 +159,8 @@ class LapanganService {
           .delete()
           .eq('id_lapangan', idLapangan);
 
-      print('Lapangan deleted successfully');
       return true;
     } catch (e) {
-      print('Error deleting lapangan: $e');
       throw Exception('Gagal menghapus lapangan: ${e.toString()}');
     }
   }
@@ -175,10 +176,8 @@ class LapanganService {
           })
           .eq('id_lane', idLane);
 
-      print('Lane status updated successfully');
       return true;
     } catch (e) {
-      print('Error updating lane status: $e');
       throw Exception('Gagal mengupdate status lane: ${e.toString()}');
     }
   }
@@ -191,11 +190,126 @@ class LapanganService {
           .delete()
           .eq('id_lane', idLane);
 
-      print('Lane deleted successfully');
       return true;
     } catch (e) {
-      print('Error deleting lane: $e');
       throw Exception('Gagal menghapus lane: ${e.toString()}');
+    }
+  }
+
+  static Future<List<LapanganModel>> ambilSemuaLapangan({String? jenisOlahragaId}) async {
+    try {
+      final response = await _supabase
+          .from('lapangan')
+          .select()
+          .eq('status_lapangan', 'buka')
+          .order('created_at', ascending: false);
+
+      List<LapanganModel> lapanganList = (response as List)
+          .map((e) => LapanganModel.fromJson(e))
+          .toList();
+
+      if (jenisOlahragaId != null) {
+        List<LapanganModel> filteredLapangan = [];
+        
+        for (var lapangan in lapanganList) {
+          if (lapangan.id != null) {
+            final lanesResponse = await _supabase
+                .from('lane_lapangan')
+                .select('id_lane')
+                .eq('id_lapangan', lapangan.id!)
+                .eq('id_jenis_olahraga', jenisOlahragaId)
+                .eq('aktif', true);
+            
+            if (lanesResponse.isNotEmpty) {
+              filteredLapangan.add(lapangan);
+            }
+          }
+        }
+        
+        return filteredLapangan;
+      }
+
+      return lapanganList;
+    } catch (e) {
+      throw Exception('Gagal mengambil data lapangan: ${e.toString()}');
+    }
+  }
+
+  static Future<double?> getLowestPriceByLapangan(String idLapangan) async {
+    try {
+      final lanesResponse = await _supabase
+          .from('lane_lapangan')
+          .select('harga_per_jam')
+          .eq('id_lapangan', idLapangan)
+          .eq('aktif', true)
+          .not('harga_per_jam', 'is', null);
+      
+      if (lanesResponse.isEmpty) return null;
+      
+      double? lowestPrice;
+      for (var lane in lanesResponse) {
+        final price = lane['harga_per_jam']?.toDouble();
+        if (price != null && price > 0) {
+          if (lowestPrice == null || price < lowestPrice) {
+            lowestPrice = price;
+          }
+        }
+      }
+      
+      return lowestPrice;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<List<LapanganModel>> ambilLapanganPopuler({int limit = 10}) async {
+    try {
+      final response = await _supabase
+          .from('lapangan')
+          .select()
+          .eq('status_lapangan', 'tersedia')
+          .order('created_at', ascending: false)
+          .limit(limit);
+
+      return (response as List).map((e) => LapanganModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception('Gagal mengambil lapangan populer: ${e.toString()}');
+    }
+  }
+
+  static Future<List<LapanganModel>> searchLapangan(String query) async {
+    try {
+      final response = await _supabase
+          .from('lapangan')
+          .select()
+          .eq('status_lapangan', 'tersedia')
+          .or('nama_lapangan.ilike.%$query%,kecamatan.ilike.%$query%,kabupaten.ilike.%$query%')
+          .order('created_at', ascending: false);
+
+      return (response as List).map((e) => LapanganModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception('Gagal mencari lapangan: ${e.toString()}');
+    }
+  }
+
+  static Future<List<LapanganModel>> ambilLapanganTerdekat({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 10.0,
+  }) async {
+    try {
+      // Untuk sementara, kita ambil semua lapangan yang memiliki koordinat
+      final response = await _supabase
+          .from('lapangan')
+          .select()
+          .eq('status_lapangan', 'tersedia')
+          .not('latitude', 'is', null)
+          .not('longitude', 'is', null)
+          .order('created_at', ascending: false);
+
+      return (response as List).map((e) => LapanganModel.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception('Gagal mengambil lapangan terdekat: ${e.toString()}');
     }
   }
 }

@@ -69,9 +69,6 @@ class _TransaksiTabState extends State<TransaksiTab> {
   }
   
   void _onFilterChanged(String filter) {
-    // TODO: Implement your filter logic here
     print('Filter changed to: $filter');
-    // Nanti bisa menggunakan callback atau state management
-    // untuk mengirim filter ke parent widget
   }
 }

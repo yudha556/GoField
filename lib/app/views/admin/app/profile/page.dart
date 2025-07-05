@@ -1,5 +1,3 @@
-// import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gofield/app/views/admin/layout/main_admin_schallfold.dart';
@@ -33,7 +31,6 @@ class ProfileContent extends StatefulWidget {
 }
 
 class _ProfileContentState extends State<ProfileContent> {
-  // bool _isCustomerServiceExpanded = false;
   PenggunaModel? _pengguna;
   bool _isloading = true;
 
@@ -118,12 +115,6 @@ class _ProfileContentState extends State<ProfileContent> {
                           ],
                         ),
                       ),
-                      // IconButton(
-                      //   icon: const Icon(Icons.settings, color: Colors.white),
-                      //   onPressed: () {
-                      //     context.go(AppRoutes.userSettingPage);
-                      //   },
-                      // ),
                     ],
                   ),
                 ),

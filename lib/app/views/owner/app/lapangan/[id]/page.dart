@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/core/models/lapanganDetail_model.dart';
-import 'package:gofield/core/services/ownerService/lapanganService.dart';
+import 'package:gofield/core/services/lapanganService.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/views/owner/app/lapangan/[id]/components/headerInfoLapangan.dart';
 import 'package:gofield/app/views/owner/app/lapangan/[id]/components/location.dart';
@@ -65,6 +65,31 @@ class _LapanganIdState extends State<LapanganId> {
     }
   }
 
+  // Method untuk mendapatkan harga terendah dari lanes
+  double? _getLowestPrice() {
+    if (_lapangan?.lanes == null || _lapangan!.lanes!.isEmpty) {
+      return null;
+    }
+
+    double? lowestPrice;
+    for (var lane in _lapangan!.lanes!) {
+      if (lane.hargaPerJam != null) {
+        if (lowestPrice == null || lane.hargaPerJam! < lowestPrice) {
+          lowestPrice = lane.hargaPerJam!;
+        }
+      }
+    }
+    return lowestPrice;
+  }
+
+  // Method untuk format currency
+  String _formatCurrency(double amount) {
+    return 'Rp ${amount.toInt().toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    )}';
+  }
+
   void _showErrorSnackBar(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -125,7 +150,7 @@ class _LapanganIdState extends State<LapanganId> {
         await LapanganService.deleteLane(lane.id);
         _showSuccessSnackBar('Lane ${lane.namaLane} berhasil dihapus');
         _loadLapanganDetail(); // Refresh data
-            } catch (e) {
+      } catch (e) {
         _showErrorSnackBar('Gagal menghapus lane: ${e.toString()}');
       }
     }
@@ -314,6 +339,8 @@ class _LapanganIdState extends State<LapanganId> {
   }
 
   Widget _buildContent() {
+    final lowestPrice = _getLowestPrice();
+    
     return CustomScrollView(
       slivers: [
         // App Bar
@@ -328,12 +355,27 @@ class _LapanganIdState extends State<LapanganId> {
             onPressed: () => context.go(AppRoutes.ownerLapanganPage),
           ),
           flexibleSpace: FlexibleSpaceBar(
-            title: Text(
-              _lapangan!.namaLapangan,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            title: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _lapangan!.namaLapangan,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (lowestPrice != null)
+                  Text(
+                    'Mulai dari ${_formatCurrency(lowestPrice)}/jam',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.white70,
+                    ),
+                  ),
+              ],
             ),
             background: Container(
               decoration: const BoxDecoration(
@@ -357,6 +399,77 @@ class _LapanganIdState extends State<LapanganId> {
         // Content
         SliverList(
           delegate: SliverChildListDelegate([
+            const SizedBox(height: 16),
+            
+            // Price Info Card (NEW)
+            if (lowestPrice != null)
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0088E8), Color(0xFF4DACEF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0088E8).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.monetization_on,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Harga Mulai Dari',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            '${_formatCurrency(lowestPrice)}/jam',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Text(
+                                                        'Harga terendah dari semua lane',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
             const SizedBox(height: 16),
             
             // Header Info Lapangan

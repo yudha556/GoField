@@ -5,7 +5,7 @@ import 'package:gofield/app/views/owner/layout/main_owner_schalfold.dart';
 import 'package:gofield/core/components/components.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/models/lapangan_model.dart';
-import 'package:gofield/core/services/ownerService/lapanganService.dart';
+import 'package:gofield/core/services/lapanganService.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LapanganOwner extends StatelessWidget {
@@ -36,6 +36,7 @@ class LapanganContent extends StatefulWidget {
 class _LapanganContentState extends State<LapanganContent> {
   int selectedIndex = 0;
   List<LapanganModel> listLapangan = [];
+  Map<String, double?> lapanganPrices = {};
   bool isLoading = true;
   String? errorMessage;
 
@@ -52,13 +53,11 @@ class _LapanganContentState extends State<LapanganContent> {
         errorMessage = null;
       });
 
-      // Get current user
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
         throw Exception('User tidak ditemukan');
       }
 
-      // Get pemilik lapangan ID
       final pemilikRes = await Supabase.instance.client
           .from('pemilik_lapangan')
           .select('id_pemilik')
@@ -66,10 +65,9 @@ class _LapanganContentState extends State<LapanganContent> {
           .single();
 
       final idPemilik = pemilikRes['id_pemilik'];
-
-      // Get lapangan data
       final lapangan = await LapanganService.ambilLapanganByPemilik(idPemilik);
-      
+      await _loadPricesForLapangan(lapangan);
+
       if (mounted) {
         setState(() {
           listLapangan = lapangan;
@@ -87,6 +85,39 @@ class _LapanganContentState extends State<LapanganContent> {
     }
   }
 
+  Future<void> _loadPricesForLapangan(List<LapanganModel> lapanganList) async {
+    for (var lapangan in lapanganList) {
+      if (lapangan.id != null) {
+        try {
+          final lanesResponse = await Supabase.instance.client
+              .from('lane_lapangan')
+              .select('harga_per_jam')
+              .eq('id_lapangan', lapangan.id!)
+              .eq('aktif', true) 
+              .not('harga_per_jam', 'is', null);
+
+          if (lanesResponse.isNotEmpty) {
+            double? lowestPrice;
+            for (var lane in lanesResponse) {
+              final price = lane['harga_per_jam']?.toDouble();
+              if (price != null) {
+                if (lowestPrice == null || price < lowestPrice) {
+                  lowestPrice = price;
+                }
+              }
+            }
+            lapanganPrices[lapangan.id!] = lowestPrice;
+          } else {
+            lapanganPrices[lapangan.id!] = null;
+          }
+        } catch (e) {
+          print('Error loading price for lapangan ${lapangan.id}: $e');
+          lapanganPrices[lapangan.id!] = null;
+        }
+      }
+    }
+  }
+
   Future<void> _refreshLapangan() async {
     await _loadLapangan();
   }
@@ -98,12 +129,13 @@ class _LapanganContentState extends State<LapanganContent> {
     );
   }
 
-  // Method untuk navigasi ke detail
   void _navigateToDetail(LapanganModel lapangan) {
     context.go(AppRoutes.ownerLapanganDetailPath(lapangan.id!));
   }
 
   Widget _buildFieldCard(LapanganModel field, {double? width}) {
+    final lowestPrice = lapanganPrices[field.id];
+
     return SizedBox(
       width: width,
       child: GlobalCard(
@@ -115,61 +147,58 @@ class _LapanganContentState extends State<LapanganContent> {
           borderRadius: BorderRadius.circular(12),
           child: Stack(
             children: [
-              // Background Image - Full container dengan aspect ratio 1:1
               AspectRatio(
-                aspectRatio: 1.0, // Aspect ratio 1:1
+                aspectRatio: 1.0,
                 child: Container(
                   width: double.infinity,
                   height: double.infinity,
                   decoration: BoxDecoration(color: Colors.grey[300]),
-                   child: //field.urlGambar.isNotEmpty
-                  //     ? Image.network(
-                  //         field.urlGambar.first,
-                  //         fit: BoxFit.cover,
-                  //         width: double.infinity,
-                  //         height: double.infinity,
-                  //         errorBuilder: (context, error, stackTrace) {
-                  //           return const Icon(
-                  //             Icons.sports_soccer,
-                  //             size: 60,
-                  //             color: Colors.grey,
-                  //           );
-                  //         },
-                  //       )
-                       const Icon(
-                          Icons.sports_soccer,
-                          size: 60,
-                          color: Colors.grey,
-                        ),
+                  child: //field.urlGambar.isNotEmpty
+                      //     ? Image.network(
+                      //         field.urlGambar.first,
+                      //         fit: BoxFit.cover,
+                      //         width: double.infinity,
+                      //         height: double.infinity,
+                      //         errorBuilder: (context, error, stackTrace) {
+                      //           return const Icon(
+                      //             Icons.sports_soccer,
+                      //             size: 60,
+                      //             color: Colors.grey,
+                      //           );
+                      //         },
+                      //       )
+                      const Icon(
+                        Icons.sports_soccer,
+                        size: 60,
+                        color: Colors.grey,
+                      ),
                 ),
               ),
 
-              // Status Badge
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: field.status == 'tersedia' 
-                        ? Colors.green.withOpacity(0.9)
-                        : Colors.red.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    field.status == 'tersedia' ? 'Aktif' : 'Tidak Aktif',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
+              if (lowestPrice != null)
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF0088E8).withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Rp ${_formatCurrency(lowestPrice)}/jam',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              // DIHAPUS: More options button sudah tidak ada
-
-              // Overlay gradient untuk text readability
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -186,7 +215,6 @@ class _LapanganContentState extends State<LapanganContent> {
                 ),
               ),
 
-              // Text overlay di bagian bawah
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -197,7 +225,6 @@ class _LapanganContentState extends State<LapanganContent> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Field name
                       Text(
                         field.namaLapangan,
                         style: const TextStyle(
@@ -210,7 +237,6 @@ class _LapanganContentState extends State<LapanganContent> {
                       ),
                       const SizedBox(height: 2),
 
-                      // Location
                       Text(
                         '${field.kecamatan ?? ''}, ${field.kabupaten ?? ''}',
                         style: const TextStyle(
@@ -222,16 +248,39 @@ class _LapanganContentState extends State<LapanganContent> {
                       ),
                       const SizedBox(height: 2),
 
-                      // Kapasitas
-                      Text(
-                        '${field.kapasitas} orang',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${field.kapasitas} orang',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (lowestPrice != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Mulai Rp ${_formatCurrency(lowestPrice)}',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -255,11 +304,7 @@ class _LapanganContentState extends State<LapanganContent> {
               color: Colors.grey[100],
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.sports_soccer,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            child: Icon(Icons.sports_soccer, size: 64, color: Colors.grey[400]),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -274,10 +319,7 @@ class _LapanganContentState extends State<LapanganContent> {
           Text(
             'Mulai tambahkan lapangan pertama Anda\nuntuk menerima reservasi',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
@@ -311,11 +353,7 @@ class _LapanganContentState extends State<LapanganContent> {
               color: Colors.red[50],
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red[400],
-            ),
+            child: Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -330,10 +368,7 @@ class _LapanganContentState extends State<LapanganContent> {
           Text(
             errorMessage ?? 'Terjadi kesalahan saat memuat data lapangan',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
@@ -365,10 +400,7 @@ class _LapanganContentState extends State<LapanganContent> {
           SizedBox(height: 16),
           Text(
             'Memuat data lapangan...',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF2D3748),
-            ),
+            style: TextStyle(fontSize: 16, color: Color(0xFF2D3748)),
           ),
         ],
       ),
@@ -440,22 +472,39 @@ class _LapanganContentState extends State<LapanganContent> {
                 minHeight: MediaQuery.of(context).size.height - 200,
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18.0,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header dengan jumlah lapangan
                     if (!isLoading && listLapangan.isNotEmpty) ...[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            'Lapangan Saya (${listLapangan.length})',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2D3748),
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Lapangan Saya (${listLapangan.length})',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2D3748),
+                                ),
+                              ),
+                              if (lapanganPrices.values.any(
+                                (price) => price != null,
+                              ))
+                                Text(
+                                  _getPriceRangeText(),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                            ],
                           ),
                           TextButton.icon(
                             onPressed: _refreshLapangan,
@@ -467,7 +516,7 @@ class _LapanganContentState extends State<LapanganContent> {
                           ),
                         ],
                       ),
-                                            const SizedBox(height: 16),
+                      const SizedBox(height: 16),
                     ],
 
                     // Content berdasarkan state
@@ -486,12 +535,11 @@ class _LapanganContentState extends State<LapanganContent> {
                           crossAxisCount: 2,
                           mainAxisSpacing: 16,
                           crossAxisSpacing: 16,
-                          childAspectRatio: 1.0, 
+                          childAspectRatio: 1.0,
                         ),
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
-                              // Navigasi ke detail lapangan
                               _navigateToDetail(listLapangan[index]);
                             },
                             child: _buildFieldCard(
@@ -506,7 +554,6 @@ class _LapanganContentState extends State<LapanganContent> {
               ),
             ),
 
-            // Floating Action Button
             if (!isLoading && listLapangan.isNotEmpty) ...[
               const SizedBox(height: 16),
               ElevatedButton.icon(
@@ -535,5 +582,27 @@ class _LapanganContentState extends State<LapanganContent> {
       ),
     );
   }
-}
 
+  String _getPriceRangeText() {
+    final prices = lapanganPrices.values
+        .where((price) => price != null)
+        .cast<double>()
+        .toList();
+
+    if (prices.isEmpty) return '';
+
+    if (prices.length == 1) {
+      return 'Harga: Rp ${_formatCurrency(prices.first)}/jam';
+    }
+
+    prices.sort();
+    final lowest = prices.first;
+    final highest = prices.last;
+
+    if (lowest == highest) {
+      return 'Harga: Rp ${_formatCurrency(lowest)}/jam';
+    }
+
+    return 'Harga: Rp ${_formatCurrency(lowest)} - Rp ${_formatCurrency(highest)}/jam';
+  }
+}

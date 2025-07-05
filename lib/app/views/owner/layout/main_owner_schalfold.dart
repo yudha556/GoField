@@ -89,7 +89,7 @@ class MainOwnerSchallfold extends StatelessWidget {
     // if (location.startsWith('/user/jadwal')) return 1;
     if (location.startsWith('/owner/lapangan')) return 2;
     // if (location.startsWith('/user/promo')) return 3;
-    if (location.startsWith('/admin/profile')) return 4;
+    if (location.startsWith('/owner/profile')) return 4;
     return 0;
   }
 
@@ -108,7 +108,7 @@ class MainOwnerSchallfold extends StatelessWidget {
       //   context.go(AppRoutes.userpromoPage);
       //   break;
       case 4:
-        context.go(AppRoutes.adminProfile);
+        context.go(AppRoutes.ownerProfilePage);
         break;
     }
   }
