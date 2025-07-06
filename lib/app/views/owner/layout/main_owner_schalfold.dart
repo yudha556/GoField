@@ -73,7 +73,7 @@ class MainOwnerSchallfold extends StatelessWidget {
           label: 'Lapangan',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.discount_outlined),
+          icon: Icon(Icons.note_outlined),
           label: 'Promo',
         ),
         BottomNavigationBarItem(
@@ -88,7 +88,7 @@ class MainOwnerSchallfold extends StatelessWidget {
     if (location.startsWith('/owner/home')) return 0;
     // if (location.startsWith('/user/jadwal')) return 1;
     if (location.startsWith('/owner/lapangan')) return 2;
-    // if (location.startsWith('/user/promo')) return 3;
+    if (location.startsWith('/owner/confirm')) return 3;
     if (location.startsWith('/owner/profile')) return 4;
     return 0;
   }
@@ -104,9 +104,9 @@ class MainOwnerSchallfold extends StatelessWidget {
       case 2:
         context.go(AppRoutes.ownerLapanganPage);
         break;
-      // case 3:
-      //   context.go(AppRoutes.userpromoPage);
-      //   break;
+      case 3:
+        context.go(AppRoutes.ownerConfirmPage);
+        break;
       case 4:
         context.go(AppRoutes.ownerProfilePage);
         break;

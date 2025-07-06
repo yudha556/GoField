@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/admin/app/peninjauan/%5Bid%5D/page.dart';
 import 'package:gofield/app/views/admin/app/profile/page.dart';
+import 'package:gofield/app/views/owner/app/confirm/page.dart';
 import 'package:gofield/app/views/splash/page.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/app/views/auth/register/page.dart';
@@ -158,7 +159,7 @@ class AppRouter {
           return const UserTransaksiDetail.TransactionDetail();
         },
       ),
-      
+
       // PAYMENT ROUTES - PENTING: Checkout harus didefinisikan SEBELUM route dengan parameter :id
       GoRoute(
         path: '/user/payment/checkout',
@@ -270,6 +271,13 @@ class AppRouter {
         name: 'ownerLapanganDetail',
         builder: (context, state) {
           return const LapanganId();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.ownerConfirmPage,
+        name: 'owner confirm',
+        builder: (context, state) {
+          return const ConfirmPage();
         },
       ),
     ],

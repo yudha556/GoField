@@ -833,6 +833,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       final idJadwal = jadwal?['id_jadwal'];
 
       final reservasi = ReservasiModel(
+        // idPemilik: idPemilik,
         idPengguna: userId,
         idLapangan: lapanganId,
         idLane: lane['id_lane'],
