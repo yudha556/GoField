@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gofield/core/models/reservasi_models.dart';
+import 'package:gofield/core/models/pembayaran_model.dart';
+import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/services/reservasiService.dart';
+import 'package:gofield/core/services/pembayaranService.dart';
+import 'package:gofield/core/services/jadwalKetersediaanService.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 class CheckoutPage extends StatefulWidget {
   final Map<String, dynamic> data;
-  
+
   const CheckoutPage({Key? key, required this.data}) : super(key: key);
 
   @override
@@ -25,13 +30,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
   late Map<String, dynamic> lane;
   late List<String> jamList;
 
-  // Declare variables as instance variables
   late final int hargaPerJam;
   late final int durasi;
   late final int totalHarga;
   late final String waktuMulai;
   late final String waktuSelesai;
   String formatTanggal = '';
+  String _getWaktuSelesai(List<String> jamList) {
+    if (jamList.length == 1) {
+      final parts = jamList.first.split(':');
+      final hour = int.parse(parts[0]);
+      final nextHour = (hour + 1).toString().padLeft(2, '0');
+      return '$nextHour:00';
+    }
+    return jamList.last;
+  }
 
   @override
   void initState() {
@@ -49,11 +62,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
     hargaPerJam = (lane['harga_per_jam'] as num).toInt();
     waktuMulai = jamList.first;
-    waktuSelesai = jamList.last;
+    waktuSelesai = _getWaktuSelesai(jamList); // <-- gunakan fungsi ini
     durasi = jamList.length;
     totalHarga = hargaPerJam * durasi;
-    
-    // Use default date format initially
+
     formatTanggal = DateFormat('EEEE, d MMMM yyyy').format(tanggal);
   }
 
@@ -64,12 +76,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
         setState(() {
           _isLocaleInitialized = true;
           // Update format with Indonesian locale
-          formatTanggal = DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(tanggal);
+          formatTanggal = DateFormat(
+            'EEEE, d MMMM yyyy',
+            'id_ID',
+          ).format(tanggal);
         });
       }
     } catch (e) {
       print('Failed to initialize Indonesian locale: $e');
-      // Fallback to default locale
       if (mounted) {
         setState(() {
           _isLocaleInitialized = true;
@@ -88,9 +102,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           title: const Text('Checkout'),
           backgroundColor: Colors.blue,
         ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -143,7 +155,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
             // Ringkasan Reservasi
             _buildSummarySection(),
-            const SizedBox(height: 100), // Space for floating button
+            const SizedBox(height: 100), 
           ],
         ),
       ),
@@ -214,7 +226,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
     try {
       return NumberFormat('#,###', 'id_ID').format(amount);
     } catch (e) {
-      // Fallback to default formatting if Indonesian locale fails
       return NumberFormat('#,###').format(amount);
     }
   }
@@ -533,15 +544,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildPriceRow(
-            'Harga per Jam',
-            'Rp ${_formatCurrency(hargaPerJam)}',
-          ),
+          _buildPriceRow('Harga per Jam', 'Rp ${_formatCurrency(hargaPerJam)}'),
           _buildPriceRow('Durasi', '$durasi Jam'),
-          _buildPriceRow(
-            'Subtotal',
-            'Rp ${_formatCurrency(totalHarga)}',
-          ),
+          _buildPriceRow('Subtotal', 'Rp ${_formatCurrency(totalHarga)}'),
           Container(
             margin: const EdgeInsets.only(top: 16),
             padding: const EdgeInsets.only(top: 16),
@@ -778,10 +783,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           _buildSummaryRow('Tanggal:', formatTanggal),
           _buildSummaryRow('Jam:', '$waktuMulai - $waktuSelesai'),
           _buildSummaryRow('Durasi:', '$durasi Jam'),
-          _buildSummaryRow(
-            'Total:',
-            'Rp ${_formatCurrency(totalHarga)}',
-          ),
+          _buildSummaryRow('Total:', 'Rp ${_formatCurrency(totalHarga)}'),
         ],
       ),
     );
@@ -821,20 +823,36 @@ class _CheckoutPageState extends State<CheckoutPage> {
     try {
       final userId = Supabase.instance.client.auth.currentUser!.id;
 
+      final jadwal = await JadwalService().buatJadwal(
+        idLane: lane['id_lane'],
+        tanggal: tanggal,
+        waktuMulai: jamList.first,
+        waktuSelesai: _getWaktuSelesai(jamList),
+        status: 'dipesan',
+      );
+      final idJadwal = jadwal?['id_jadwal'];
+
       final reservasi = ReservasiModel(
         idPengguna: userId,
         idLapangan: lapanganId,
         idLane: lane['id_lane'],
-        idJadwal: '', // isi jika ada
+        idJadwal: idJadwal, 
         tanggalReservasi: tanggal,
         waktuMulai: jamList.first,
-        waktuSelesai: jamList.last,
+        waktuSelesai: _getWaktuSelesai(jamList),
         durasiJam: jamList.length.toDouble(),
         totalHarga: lane['harga_per_jam'] * jamList.length,
         catatan: notesController.text,
       );
 
-      await ReservasiService().buatReservasi(reservasi);
+      final reservasiId = await ReservasiService().buatReservasi(reservasi);
+
+      final pembayaran = PembayaranModel(
+        idReservasi: reservasiId!,
+        jumlahPembayaran: reservasi.totalHarga,
+        metodePembayaran: selectedPaymentMethod,
+      );
+      await PembayaranService().buatPembayaran(pembayaran);
 
       if (mounted) {
         _showSuccessDialog();
@@ -905,7 +923,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context).pop(); // Go back to previous page
+                      context.go(AppRoutes.userDashboard); // Go back to previous page
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,

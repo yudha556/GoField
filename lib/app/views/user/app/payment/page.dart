@@ -69,7 +69,7 @@ class _PaymentContentState extends State<PaymentContent> {
   }
 
   LaneDetailModel get selectedLane =>
-      _lapangan!.lanes![_selectedLaneIndex]; // helper biar gak get get terus
+      _lapangan!.lanes![_selectedLaneIndex];
 
   @override
   Widget build(BuildContext context) {
