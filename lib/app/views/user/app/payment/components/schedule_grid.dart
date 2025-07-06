@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:gofield/core/models/lapanganDetail_model.dart';
 
 class ScheduleGrid extends StatefulWidget {
-  const ScheduleGrid({super.key});
+  final LaneDetailModel lane;
+
+  const ScheduleGrid({super.key, required this.lane});
 
   @override
   State<ScheduleGrid> createState() => _ScheduleGridState();
 }
 
 class _ScheduleGridState extends State<ScheduleGrid> {
-  int selectedIndex = 0;
+  int selectedIndex = -1;
 
   final List<String> pilihJam = [
     '00:00',
@@ -48,21 +51,33 @@ class _ScheduleGridState extends State<ScheduleGrid> {
         mainAxisSpacing: 8,
         childAspectRatio: 1.5,
       ),
-      itemCount: 24,
+      itemCount: pilihJam.length,
       itemBuilder: (context, index) {
-        return 
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[400],
-            borderRadius: BorderRadius.circular(15)
+        final isSelected = selectedIndex == index;
+
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: isSelected ? Colors.green : Colors.grey[400],
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: isSelected ? Colors.green : Colors.transparent,
+                width: 2,
+              ),
             ),
-          child: Center(
-            child: Text(
-              pilihJam[index],
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
+            child: Center(
+              child: Text(
+                pilihJam[index],
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.white : Colors.black,
+                ),
               ),
             ),
           ),

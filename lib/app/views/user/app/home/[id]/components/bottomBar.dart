@@ -8,12 +8,14 @@ class DetailLapanganBottomBar extends StatelessWidget {
   final VoidCallback onBookingPressed;
   final double? lowestPrice;
   final String? status;
+  final String lapanganId;
 
   const DetailLapanganBottomBar({
     super.key,
     required this.isAvailable,
     required this.onChatPressed,
     required this.onBookingPressed,
+    required this.lapanganId,
     this.lowestPrice,
     this.status,
   });
@@ -124,11 +126,11 @@ class DetailLapanganBottomBar extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: ElevatedButton.icon(
-                    onPressed: isAvailable
-                        ? () {
-                            context.go(AppRoutes.userPaymentPage);
-                          }
+                    onPressed: lapanganId != null
+                        ? () =>
+                              context.go(AppRoutes.userPaymentPath(lapanganId!))
                         : null,
+
                     icon: Icon(
                       isAvailable ? Icons.calendar_today : Icons.block,
                       size: 20,
@@ -220,6 +222,7 @@ class CompactDetailBottomBar extends StatelessWidget {
   final VoidCallback onChatPressed;
   final VoidCallback onBookingPressed;
   final double? lowestPrice;
+  final String lapanganId;
 
   const CompactDetailBottomBar({
     super.key,
@@ -227,6 +230,7 @@ class CompactDetailBottomBar extends StatelessWidget {
     required this.onChatPressed,
     required this.onBookingPressed,
     this.lowestPrice,
+    required this.lapanganId,
   });
 
   String _formatCurrency(double amount) {

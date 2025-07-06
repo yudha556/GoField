@@ -21,15 +21,16 @@ import 'package:gofield/app/views/user/app/home/components/list.dart'
 import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
     as UserTransaksiDetail;
 // import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
-    // as UserSettingPage;
+// as UserSettingPage;
 import 'package:gofield/app/views/user/app/home/[id]/page.dart';
 import 'package:gofield/app/views/user/app/payment/page.dart';
+import 'package:gofield/app/views/user/app/payment/[id]/page.dart'
+    as CheckoutPage;
 
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
     as UserRegisterToOwner;
-import 'package:gofield/app/views/user/app/registerOwner/components/daftarOwner.dart'
-    as OwnerRegisterForm;
+import 'package:gofield/app/views/user/app/registerOwner/components/daftarOwner.dart';
 import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegister.dart'
     as WaitingRegisterToOwner;
 
@@ -165,6 +166,25 @@ class AppRouter {
       //     return const UserSettingPage.Settingpage();
       //   },
       // ),
+      GoRoute(
+        path: '/user/payment/:id',
+        name: 'User Payment Page',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return PaymentPage(lapanganId: id);
+        },
+      ),
+
+      GoRoute(
+        path: '/user/payment/:id',
+        name: 'user checkout',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return CheckoutPage.CheckoutPage(
+            id: id,
+          ); // pastikan halaman ini terima `id`
+        },
+      ),
 
       // user register ke owner
       GoRoute(
@@ -178,7 +198,7 @@ class AppRouter {
         path: AppRoutes.OwnerRegisterForm,
         name: 'Owner Register Form',
         builder: (context, state) {
-          return const OwnerRegisterForm.Daftarlapangan();
+          return const Daftarlapangan();
         },
       ),
       GoRoute(
@@ -219,13 +239,6 @@ class AppRouter {
         name: 'admin profile',
         builder: (context, state) {
           return const AdminProfile();
-        },
-      ),
-      GoRoute(
-        path: AppRoutes.userPaymentPage,
-        name: 'User Payment Page',
-        builder: (context, state) {
-          return const PaymentPage();
         },
       ),
 

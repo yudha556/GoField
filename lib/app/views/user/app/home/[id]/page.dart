@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gofield/app/views/owner/app/lapangan/%5Bid%5D/page.dart';
 import 'package:gofield/core/models/lapanganDetail_model.dart';
 import 'package:gofield/core/router/app_routes.dart';
 import 'package:gofield/core/services/lapanganService.dart';
@@ -97,8 +98,12 @@ class _DetailLapanganState extends State<DetailLapangan> {
   }
 
   void _handleBooking() {
-    _showSnackBar('Fitur booking akan segera tersedia');
+  if (_lapanganId != null) {
+    context.go(AppRoutes.userCheckoutWithId(_lapanganId!));
+  } else {
+    _showSnackBar('ID Lapangan tidak tersedia', isError: true);
   }
+}
 
   void _handleChat() {
     _showSnackBar('Fitur chat akan segera tersedia');
@@ -785,7 +790,8 @@ class _DetailLapanganState extends State<DetailLapangan> {
         onChatPressed: _handleChat,
         onBookingPressed: _handleBooking,
         lowestPrice: lowestPrice,
-        status: _lapangan!.status, 
+        status: _lapangan!.status,
+        lapanganId: _lapanganId!,
       ),
     );
   }
