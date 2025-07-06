@@ -29,8 +29,8 @@ class AppRoutes {
   static const String userPaymentPage = '/user/payment/:id';
 static String userPaymentPath(String id) => '/user/payment/$id';
   static String userCheckoutWithId(String id) => '/user/payment/$id';
-  static const String userCheckoutPage = '/user/payment/:id';
-  static String userCheckoutPath(String lapanganId) => '/user/checkout/$lapanganId';
+  static const String userCheckoutPage = '/user/payment/checkout';
+
 
 
   // register owner

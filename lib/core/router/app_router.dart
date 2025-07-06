@@ -24,8 +24,7 @@ import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
 // as UserSettingPage;
 import 'package:gofield/app/views/user/app/home/[id]/page.dart';
 import 'package:gofield/app/views/user/app/payment/page.dart';
-import 'package:gofield/app/views/user/app/payment/[id]/page.dart'
-    as CheckoutPage;
+import 'package:gofield/app/views/user/app/payment/[id]/page.dart';
 
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
@@ -159,30 +158,22 @@ class AppRouter {
           return const UserTransaksiDetail.TransactionDetail();
         },
       ),
-      // GoRoute(
-      //   path: AppRoutes.userSettingPage,
-      //   name: 'Settings',
-      //   builder: (context, state) {
-      //     return const UserSettingPage.Settingpage();
-      //   },
-      // ),
+      
+      // PAYMENT ROUTES - PENTING: Checkout harus didefinisikan SEBELUM route dengan parameter :id
+      GoRoute(
+        path: '/user/payment/checkout',
+        name: 'checkout',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return CheckoutPage(data: data);
+        },
+      ),
       GoRoute(
         path: '/user/payment/:id',
-        name: 'User Payment Page',
+        name: 'payment',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return PaymentPage(lapanganId: id);
-        },
-      ),
-
-      GoRoute(
-        path: '/user/payment/:id',
-        name: 'user checkout',
-        builder: (context, state) {
-          final id = state.pathParameters['id']!;
-          return CheckoutPage.CheckoutPage(
-            id: id,
-          ); // pastikan halaman ini terima `id`
         },
       ),
 

@@ -99,7 +99,7 @@ class _DetailLapanganState extends State<DetailLapangan> {
 
   void _handleBooking() {
   if (_lapanganId != null) {
-    context.go(AppRoutes.userCheckoutWithId(_lapanganId!));
+    context.go(AppRoutes.userPaymentPath(_lapanganId!));
   } else {
     _showSnackBar('ID Lapangan tidak tersedia', isError: true);
   }

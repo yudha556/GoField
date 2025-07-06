@@ -2,13 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class DateScrollView extends StatefulWidget {
+  final DateTime? initialDate;
+  final ValueChanged<DateTime>? onDateSelected;
+
+  const DateScrollView({super.key, this.initialDate, this.onDateSelected});
+
   @override
   _DateScrollViewState createState() => _DateScrollViewState();
 }
 
 class _DateScrollViewState extends State<DateScrollView> {
-  final DateTime today = DateTime.now();
+  late final DateTime today;
   DateTime? selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    today = DateTime.now();
+    selectedDate = widget.initialDate ?? today;
+  }
 
   List<DateTime> getDates() {
     return List.generate(7, (index) => today.add(Duration(days: index)));
@@ -26,7 +38,7 @@ class _DateScrollViewState extends State<DateScrollView> {
           children: dates.map((date) {
             bool isToday = isSameDate(date, today);
             bool isSelected = selectedDate == null
-                ? isSameDate(date, today) 
+                ? isSameDate(date, today)
                 : isSameDate(date, selectedDate!);
 
             return GestureDetector(
@@ -34,6 +46,9 @@ class _DateScrollViewState extends State<DateScrollView> {
                 setState(() {
                   selectedDate = date;
                 });
+                if (widget.onDateSelected != null) {
+                  widget.onDateSelected!(date);
+                }
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6.0),
@@ -56,7 +71,7 @@ class _DateScrollViewState extends State<DateScrollView> {
                         blurRadius: 4,
                         offset: Offset(0, 2),
                       ),
-                    ]
+                    ],
                   ),
                   padding: EdgeInsets.all(10),
                   child: Column(
