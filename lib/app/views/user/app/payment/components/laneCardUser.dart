@@ -1,6 +1,5 @@
   import 'package:flutter/material.dart';
   import 'package:gofield/core/models/lapanganDetail_model.dart';
-  import 'package:gofield/core/models/jenisOlahraga_model.dart';
 
   class LaneInfoCard extends StatelessWidget {
     final LaneDetailModel lane;
@@ -59,62 +58,62 @@
                 ),
                 const Spacer(),
                 // Action buttons
-                Row(
-                  children: [
-                    if (onEdit != null)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF0088E8).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: IconButton(
-                                                icon: const Icon(
-                            Icons.edit,
-                            color: Color(0xFF0088E8),
-                            size: 20,
-                          ),
-                          onPressed: onEdit,
-                          tooltip: 'Edit Lane',
-                        ),
-                      ),
-                    const SizedBox(width: 8),
-                    if (onToggleStatus != null)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: lane.aktif
-                              ? Colors.orange.withOpacity(0.1)
-                              : Colors.green.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            lane.aktif ? Icons.pause : Icons.play_arrow,
-                            color: lane.aktif ? Colors.orange : Colors.green,
-                            size: 20,
-                          ),
-                          onPressed: () => onToggleStatus!(!lane.aktif),
-                          tooltip: lane.aktif ? 'Nonaktifkan' : 'Aktifkan',
-                        ),
-                      ),
-                    const SizedBox(width: 8),
-                    if (onDelete != null)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                            size: 20,
-                          ),
-                          onPressed: onDelete,
-                          tooltip: 'Hapus Lane',
-                        ),
-                      ),
-                  ],
-                ),
+              //   Row(
+              //     children: [
+              //       if (onEdit != null)
+              //         Container(
+              //           decoration: BoxDecoration(
+              //             color: const Color(0xFF0088E8).withOpacity(0.1),
+              //             borderRadius: BorderRadius.circular(8),
+              //           ),
+              //           child: IconButton(
+              //                                   icon: const Icon(
+              //               Icons.edit,
+              //               color: Color(0xFF0088E8),
+              //               size: 20,
+              //             ),
+              //             onPressed: onEdit,
+              //             tooltip: 'Edit Lane',
+              //           ),
+              //         ),
+              //       const SizedBox(width: 8),
+              //       if (onToggleStatus != null)
+              //         Container(
+              //           decoration: BoxDecoration(
+              //             color: lane.aktif
+              //                 ? Colors.orange.withOpacity(0.1)
+              //                 : Colors.green.withOpacity(0.1),
+              //             borderRadius: BorderRadius.circular(8),
+              //           ),
+              //           child: IconButton(
+              //             icon: Icon(
+              //               lane.aktif ? Icons.pause : Icons.play_arrow,
+              //               color: lane.aktif ? Colors.orange : Colors.green,
+              //               size: 20,
+              //             ),
+              //             onPressed: () => onToggleStatus!(!lane.aktif),
+              //             tooltip: lane.aktif ? 'Nonaktifkan' : 'Aktifkan',
+              //           ),
+              //         ),
+              //       const SizedBox(width: 8),
+              //       if (onDelete != null)
+              //         Container(
+              //           decoration: BoxDecoration(
+              //             color: Colors.red.withOpacity(0.1),
+              //             borderRadius: BorderRadius.circular(8),
+              //           ),
+              //           child: IconButton(
+              //             icon: const Icon(
+              //               Icons.delete,
+              //               color: Colors.red,
+              //               size: 20,
+              //             ),
+              //             onPressed: onDelete,
+              //             tooltip: 'Hapus Lane',
+              //           ),
+              //         ),
+              //     ],
+              //   ),
               ],
             ),
             const SizedBox(height: 20),
@@ -128,7 +127,7 @@
             const SizedBox(height: 20),
 
             // Jadwal Section (Placeholder)
-            _buildJadwalSection(),
+            // _buildJadwalSection(),
           ],
         ),
       );
@@ -253,13 +252,13 @@
                     color: const Color(0xFF0088E8),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: IconButton(
-                    icon: const Icon(Icons.add, color: Colors.white, size: 16),
-                    onPressed: () {
-                      // TODO: Implement add image
-                    },
-                    tooltip: 'Tambah Gambar',
-                  ),
+                  // child: IconButton(
+                  //   icon: const Icon(Icons.add, color: Colors.white, size: 16),
+                  //   onPressed: () {
+                  //     // TODO: Implement add image
+                  //   },
+                  //   tooltip: 'Tambah Gambar',
+                  // ),
                 ),
               ],
             ),
@@ -333,82 +332,82 @@
       );
     }
 
-    Widget _buildJadwalSection() {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[200]!),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.schedule, color: Color(0xFF0088E8), size: 20),
-                const SizedBox(width: 8),
-                const Text(
-                  'Jadwal Operasional',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2D3748),
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0088E8),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.white, size: 16),
-                    onPressed: () {
-                      // TODO: Implement edit schedule
-                    },
-                    tooltip: 'Atur Jadwal',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+    // Widget _buildJadwalSection() {
+    //   return Container(
+    //     padding: const EdgeInsets.all(16),
+    //     decoration: BoxDecoration(
+    //       color: Colors.grey[50],
+    //       borderRadius: BorderRadius.circular(12),
+    //       border: Border.all(color: Colors.grey[200]!),
+    //     ),
+    //     child: Column(
+    //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       children: [
+    //         Row(
+    //           children: [
+    //             const Icon(Icons.schedule, color: Color(0xFF0088E8), size: 20),
+    //             const SizedBox(width: 8),
+    //             const Text(
+    //               'Jadwal Operasional',
+    //               style: TextStyle(
+    //                 fontSize: 16,
+    //                 fontWeight: FontWeight.bold,
+    //                 color: Color(0xFF2D3748),
+    //               ),
+    //             ),
+    //             const Spacer(),
+    //             Container(
+    //               decoration: BoxDecoration(
+    //                 color: const Color(0xFF0088E8),
+    //                 borderRadius: BorderRadius.circular(6),
+    //               ),
+    //               child: IconButton(
+    //                 icon: const Icon(Icons.edit, color: Colors.white, size: 16),
+    //                 onPressed: () {
+    //                   // TODO: Implement edit schedule
+    //                 },
+    //                 tooltip: 'Atur Jadwal',
+    //               ),
+    //             ),
+    //           ],
+    //         ),
+    //         const SizedBox(height: 12),
             
-            // Schedule placeholder
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Column(
-                children: [
-                  Icon(Icons.calendar_today, size: 32, color: Colors.grey[400]),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Jadwal belum diatur',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Tap edit untuk mengatur jadwal operasional',
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-    }
+    //         // Schedule placeholder
+    //         Container(
+    //           padding: const EdgeInsets.all(12),
+    //           decoration: BoxDecoration(
+    //             color: Colors.white,
+    //             borderRadius: BorderRadius.circular(8),
+    //             border: Border.all(color: Colors.grey[300]!),
+    //           ),
+    //           child: Column(
+    //             children: [
+    //               Icon(Icons.calendar_today, size: 32, color: Colors.grey[400]),
+    //               const SizedBox(height: 8),
+    //               Text(
+    //                 'Jadwal belum diatur',
+    //                 style: TextStyle(
+    //                   fontSize: 12,
+    //                   color: Colors.grey[600],
+    //                 ),
+    //               ),
+    //               const SizedBox(height: 4),
+    //               Text(
+    //                 'Tap edit untuk mengatur jadwal operasional',
+    //                 style: TextStyle(
+    //                   fontSize: 10,
+    //                   color: Colors.grey[500],
+    //                 ),
+    //                 textAlign: TextAlign.center,
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   );
+    // }
 
     String _formatCurrency(double amount) {
       return amount.toInt().toString().replaceAllMapped(

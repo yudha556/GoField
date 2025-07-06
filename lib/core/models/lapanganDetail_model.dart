@@ -38,30 +38,30 @@ class LapanganDetailModel {
   });
 
   factory LapanganDetailModel.fromJson(Map<String, dynamic> json) {
-    return LapanganDetailModel(
-      id: json['id_lapangan'] ?? '',
-      idPemilik: json['id_pemilik'] ?? '',
-      namaLapangan: json['nama_lapangan'] ?? '',
-      deskripsiLapangan: json['deskripsi_lapangan'] ?? '',
-      alamat: json['alamat'] ?? '',
-      kecamatan: json['kecamatan'],
-      kabupaten: json['kabupaten'],
-      provinsi: json['provinsi'],
-      latitude: json['latitude']?.toDouble(),
-      longitude: json['longitude']?.toDouble(),
-      kapasitas: json['kapasitas'] ?? 0,
-      status: json['status_lapangan'] ?? '',
-      fasilitas: json['fasilitas'],
-      urlGambar: json['url_gambar'] != null 
-          ? List<String>.from(json['url_gambar']) 
-          : null,
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(json['updated_at'] ?? DateTime.now().toIso8601String()),
-      lanes: json['lanes'] != null
-          ? (json['lanes'] as List).map((e) => LaneDetailModel.fromJson(e)).toList()
-          : null,
-    );
-  }
+  return LapanganDetailModel(
+    id: json['id_lapangan'] ?? '',
+    idPemilik: json['id_pemilik'] ?? '',
+    namaLapangan: json['nama_lapangan'] ?? '',
+    deskripsiLapangan: json['deskripsi_lapangan'] ?? '',
+    alamat: json['alamat_lapangan'] ?? '',
+    kecamatan: json['kecamatan'],
+    kabupaten: json['kabupaten'],
+    provinsi: json['provinsi'],
+    latitude: json['latitude']?.toDouble(),
+    longitude: json['longitude']?.toDouble(),
+    kapasitas: json['kapasitas_pemain'] ?? 0,
+    status: json['status_lapangan'] ?? '',
+    fasilitas: json['fasilitas'],
+    urlGambar: json['url_gambar'] != null 
+        ? List<String>.from(json['url_gambar']) 
+        : null,
+    createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
+    updatedAt: DateTime.parse(json['updated_at'] ?? DateTime.now().toIso8601String()),
+    lanes: json['lanes'] != null
+        ? (json['lanes'] as List).map((e) => LaneDetailModel.fromJson(e)).toList()
+        : null,
+  );
+}
 
   Map<String, dynamic> toJson() {
     return {
@@ -76,7 +76,7 @@ class LapanganDetailModel {
       'latitude': latitude,
       'longitude': longitude,
       'kapasitas': kapasitas,
-      'status_lapangan': status,
+      'status': status,
       'fasilitas': fasilitas,
       'url_gambar': urlGambar,
       'created_at': createdAt.toIso8601String(),

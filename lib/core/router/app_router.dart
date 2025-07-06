@@ -21,14 +21,15 @@ import 'package:gofield/app/views/user/app/home/components/list.dart'
 import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
     as UserTransaksiDetail;
 // import 'package:gofield/app/views/user/app/profile/components/settingPage.dart'
-    // as UserSettingPage;
+// as UserSettingPage;
 import 'package:gofield/app/views/user/app/home/[id]/page.dart';
+import 'package:gofield/app/views/user/app/payment/page.dart';
+import 'package:gofield/app/views/user/app/payment/[id]/page.dart';
 
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
     as UserRegisterToOwner;
-import 'package:gofield/app/views/user/app/registerOwner/components/daftarOwner.dart'
-    as OwnerRegisterForm;
+import 'package:gofield/app/views/user/app/registerOwner/components/daftarOwner.dart';
 import 'package:gofield/app/views/user/app/registerOwner/components/waitingRegister.dart'
     as WaitingRegisterToOwner;
 
@@ -157,13 +158,24 @@ class AppRouter {
           return const UserTransaksiDetail.TransactionDetail();
         },
       ),
-      // GoRoute(
-      //   path: AppRoutes.userSettingPage,
-      //   name: 'Settings',
-      //   builder: (context, state) {
-      //     return const UserSettingPage.Settingpage();
-      //   },
-      // ),
+      
+      // PAYMENT ROUTES - PENTING: Checkout harus didefinisikan SEBELUM route dengan parameter :id
+      GoRoute(
+        path: '/user/payment/checkout',
+        name: 'checkout',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>;
+          return CheckoutPage(data: data);
+        },
+      ),
+      GoRoute(
+        path: '/user/payment/:id',
+        name: 'payment',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          return PaymentPage(lapanganId: id);
+        },
+      ),
 
       // user register ke owner
       GoRoute(
@@ -177,7 +189,7 @@ class AppRouter {
         path: AppRoutes.OwnerRegisterForm,
         name: 'Owner Register Form',
         builder: (context, state) {
-          return const OwnerRegisterForm.Daftarlapangan();
+          return const Daftarlapangan();
         },
       ),
       GoRoute(

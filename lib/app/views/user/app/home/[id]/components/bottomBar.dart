@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gofield/core/router/app_routes.dart';
 
 class DetailLapanganBottomBar extends StatelessWidget {
   final bool isAvailable;
   final VoidCallback onChatPressed;
   final VoidCallback onBookingPressed;
   final double? lowestPrice;
-  final String? status; 
+  final String? status;
+  final String lapanganId;
 
   const DetailLapanganBottomBar({
     super.key,
     required this.isAvailable,
     required this.onChatPressed,
     required this.onBookingPressed,
+    required this.lapanganId,
     this.lowestPrice,
     this.status,
   });
 
   String _formatCurrency(double amount) {
-    return 'Rp ${amount.toInt().toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    )}';
+    return 'Rp ${amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
   }
 
   String _getButtonText() {
     if (status == null) return 'Tidak Tersedia';
-    
+
     switch (status!) {
       case 'buka':
         return 'Pesan Sekarang';
@@ -40,7 +41,7 @@ class DetailLapanganBottomBar extends StatelessWidget {
 
   Color _getButtonColor() {
     if (status == null) return Colors.grey;
-    
+
     switch (status!) {
       case 'buka':
         return const Color(0xFF0088E8);
@@ -77,10 +78,7 @@ class DetailLapanganBottomBar extends StatelessWidget {
                 children: [
                   const Text(
                     'Mulai dari',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   Text(
                     '${_formatCurrency(lowestPrice!)}/jam',
@@ -94,17 +92,14 @@ class DetailLapanganBottomBar extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            
+
             Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: OutlinedButton.icon(
                     onPressed: onChatPressed,
-                    icon: const Icon(
-                      Icons.chat_bubble_outline,
-                      size: 20,
-                    ),
+                    icon: const Icon(Icons.chat_bubble_outline, size: 20),
                     label: const Text(
                       'Chat',
                       style: TextStyle(
@@ -125,13 +120,17 @@ class DetailLapanganBottomBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(width: 12),
-                
+
                 Expanded(
                   flex: 2,
                   child: ElevatedButton.icon(
-                    onPressed: isAvailable ? onBookingPressed : null,
+                    onPressed: lapanganId != null
+                        ? () =>
+                              context.go(AppRoutes.userPaymentPath(lapanganId!))
+                        : null,
+
                     icon: Icon(
                       isAvailable ? Icons.calendar_today : Icons.block,
                       size: 20,
@@ -150,7 +149,7 @@ class DetailLapanganBottomBar extends StatelessWidget {
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       elevation: isAvailable ? 2 : 0,
-                      shadowColor: isAvailable 
+                      shadowColor: isAvailable
                           ? const Color(0xFF0088E8).withOpacity(0.3)
                           : null,
                       shape: RoundedRectangleBorder(
@@ -196,29 +195,20 @@ class DetailLapanganFloatingButtons extends StatelessWidget {
           backgroundColor: Colors.green,
           heroTag: "chat",
           tooltip: 'Chat dengan Pemilik',
-          child: const Icon(
-            Icons.chat_bubble_outline,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.chat_bubble_outline, color: Colors.white),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Booking Button
         FloatingActionButton.extended(
           onPressed: onBookingPressed,
           backgroundColor: const Color(0xFF0088E8),
           heroTag: "booking",
-          icon: const Icon(
-            Icons.calendar_today,
-            color: Colors.white,
-          ),
+          icon: const Icon(Icons.calendar_today, color: Colors.white),
           label: const Text(
             'Pesan Sekarang',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
       ],
@@ -232,6 +222,7 @@ class CompactDetailBottomBar extends StatelessWidget {
   final VoidCallback onChatPressed;
   final VoidCallback onBookingPressed;
   final double? lowestPrice;
+  final String lapanganId;
 
   const CompactDetailBottomBar({
     super.key,
@@ -239,13 +230,11 @@ class CompactDetailBottomBar extends StatelessWidget {
     required this.onChatPressed,
     required this.onBookingPressed,
     this.lowestPrice,
+    required this.lapanganId,
   });
 
   String _formatCurrency(double amount) {
-    return 'Rp ${amount.toInt().toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    )}';
+    return 'Rp ${amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
   }
 
   @override
@@ -273,10 +262,7 @@ class CompactDetailBottomBar extends StatelessWidget {
                 children: [
                   const Text(
                     'Mulai dari',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
                     '${_formatCurrency(lowestPrice!)}/jam',
@@ -290,7 +276,7 @@ class CompactDetailBottomBar extends StatelessWidget {
               ),
               const SizedBox(width: 16),
             ],
-            
+
             // Buttons
             Expanded(
               child: Row(
@@ -313,15 +299,15 @@ class CompactDetailBottomBar extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                   ],
-                  
+
                   // Booking Button
                   Expanded(
                     flex: isAvailable ? 2 : 1,
                     child: ElevatedButton(
                       onPressed: isAvailable ? onBookingPressed : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isAvailable 
-                            ? const Color(0xFF0088E8) 
+                        backgroundColor: isAvailable
+                            ? const Color(0xFF0088E8)
                             : Colors.grey,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 12),

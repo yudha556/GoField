@@ -26,6 +26,11 @@ class AppRoutes {
   static const String userSettingPage = '/settings';
   static const String userLapanganDetailPage = '/user/lapangan/:id';
   static String userLapanganDetailPath(String id) => '/user/lapangan/$id';
+  static const String userPaymentPage = '/user/payment/:id';
+static String userPaymentPath(String id) => '/user/payment/$id';
+  static String userCheckoutWithId(String id) => '/user/payment/$id';
+  static const String userCheckoutPage = '/user/payment/checkout';
+
 
 
   // register owner
@@ -35,8 +40,8 @@ class AppRoutes {
 
   // admin route
   static const String adminPeninjauanPage = '/admin/peninjauan';
-static const String adminPeninjauanId = '/admin/peninjauan/:id';
-static String adminPeninjauanDetail(String id) => '/admin/peninjauan/$id';
+  static const String adminPeninjauanId = '/admin/peninjauan/:id';
+  static String adminPeninjauanDetail(String id) => '/admin/peninjauan/$id';
 
   static const String adminProfile = '/admin/profile';
 

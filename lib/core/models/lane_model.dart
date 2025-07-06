@@ -28,7 +28,7 @@ class LaneModel {
       id: json['id_lane'],
       idLapangan: json['id_lapangan'],
       idOlahraga: json['id_jenis_olahraga'],
-      namaLane: json['nama_lane'],
+      namaLane: json['nama_jenis'],
       deskripsi: json['deskripsi'] ?? '',
       kapasitas: json['kapasitas_pemain'],
       hargaPerJam: double.tryParse(json['harga_per_jam'].toString()) ?? 0,
@@ -47,7 +47,7 @@ class LaneModel {
     return {
       'id_lapangan': idLapangan,
       'id_jenis_olahraga': idOlahraga, 
-      'nama_lane': namaLane,
+      'nama_jenis': namaLane,
       'deskripsi': deskripsi,
       'kapasitas_pemain': kapasitas, 
       'harga_per_jam': hargaPerJam,
