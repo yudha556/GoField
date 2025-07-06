@@ -9,6 +9,7 @@ class ReservasiModel {
   final double durasiJam;
   final double totalHarga;
   final String catatan;
+  final String statusReservasi;
 
   ReservasiModel({
     required this.idPengguna,
@@ -21,6 +22,7 @@ class ReservasiModel {
     required this.durasiJam,
     required this.totalHarga,
     required this.catatan,
+    this.statusReservasi = 'menunggu',
   });
 
   Map<String, dynamic> toJson() {
@@ -35,6 +37,7 @@ class ReservasiModel {
       'durasi_jam': durasiJam,
       'total_harga': totalHarga,
       'catatan_reservasi': catatan,
+      'status_reservasi': statusReservasi,
     };
   }
 }

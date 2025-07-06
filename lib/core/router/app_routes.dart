@@ -27,11 +27,9 @@ class AppRoutes {
   static const String userLapanganDetailPage = '/user/lapangan/:id';
   static String userLapanganDetailPath(String id) => '/user/lapangan/$id';
   static const String userPaymentPage = '/user/payment/:id';
-static String userPaymentPath(String id) => '/user/payment/$id';
+  static String userPaymentPath(String id) => '/user/payment/$id';
   static String userCheckoutWithId(String id) => '/user/payment/$id';
   static const String userCheckoutPage = '/user/payment/checkout';
-
-
 
   // register owner
   static const String userRegisterToOwner = '/registerToOwner';
@@ -55,4 +53,6 @@ static String userPaymentPath(String id) => '/user/payment/$id';
   static String tambahLaneWithParams(String lapanganId, String namaLapangan) {
     return '$tambahLane?lapanganId=$lapanganId&namaLapangan=${Uri.encodeComponent(namaLapangan)}';
   }
+
+  static const String ownerConfirmPage = '/owner/confirm';
 }
