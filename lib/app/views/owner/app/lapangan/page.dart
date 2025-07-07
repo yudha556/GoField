@@ -138,7 +138,7 @@ class _LapanganContentState extends State<LapanganContent> {
 
     return SizedBox(
       width: width,
-      child: GlobalCard(
+      child: GlobalCard(  
         padding: EdgeInsets.zero,
         borderRadius: BorderRadius.circular(12),
         elevation: 3,

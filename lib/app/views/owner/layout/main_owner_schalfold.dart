@@ -65,8 +65,8 @@ class MainOwnerSchallfold extends StatelessWidget {
           label: 'Dashboard',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.search_rounded),
-          label: 'Cari',
+          icon: Icon(Icons.chat_outlined),
+          label: 'Pesan',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.line_style_outlined),
@@ -74,7 +74,7 @@ class MainOwnerSchallfold extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.note_outlined),
-          label: 'Promo',
+          label: 'Permintaan',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person_outline),
@@ -86,7 +86,7 @@ class MainOwnerSchallfold extends StatelessWidget {
 
   int _getCurrentIndex(String location) {
     if (location.startsWith('/owner/home')) return 0;
-    // if (location.startsWith('/user/jadwal')) return 1;
+    if (location.startsWith('/owner/chat')) return 1;
     if (location.startsWith('/owner/lapangan')) return 2;
     if (location.startsWith('/owner/confirm')) return 3;
     if (location.startsWith('/owner/profile')) return 4;
@@ -98,9 +98,9 @@ class MainOwnerSchallfold extends StatelessWidget {
       case 0:
         context.go(AppRoutes.ownerDashboard);
         break;
-      // case 1:
-      //   context.go(AppRoutes.userSearchPage);
-      //   break;
+      case 1:
+        context.go(AppRoutes.ownerChatPage);
+        break;
       case 2:
         context.go(AppRoutes.ownerLapanganPage);
         break;

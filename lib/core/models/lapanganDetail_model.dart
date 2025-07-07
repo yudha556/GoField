@@ -16,6 +16,7 @@ class LapanganDetailModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<LaneDetailModel>? lanes;
+  final String? namaPerusahaan;
 
   LapanganDetailModel({
     required this.id,
@@ -35,33 +36,41 @@ class LapanganDetailModel {
     required this.createdAt,
     required this.updatedAt,
     this.lanes,
+    this.namaPerusahaan,
   });
 
   factory LapanganDetailModel.fromJson(Map<String, dynamic> json) {
-  return LapanganDetailModel(
-    id: json['id_lapangan'] ?? '',
-    idPemilik: json['id_pemilik'] ?? '',
-    namaLapangan: json['nama_lapangan'] ?? '',
-    deskripsiLapangan: json['deskripsi_lapangan'] ?? '',
-    alamat: json['alamat_lapangan'] ?? '',
-    kecamatan: json['kecamatan'],
-    kabupaten: json['kabupaten'],
-    provinsi: json['provinsi'],
-    latitude: json['latitude']?.toDouble(),
-    longitude: json['longitude']?.toDouble(),
-    kapasitas: json['kapasitas_pemain'] ?? 0,
-    status: json['status_lapangan'] ?? '',
-    fasilitas: json['fasilitas'],
-    urlGambar: json['url_gambar'] != null 
-        ? List<String>.from(json['url_gambar']) 
-        : null,
-    createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
-    updatedAt: DateTime.parse(json['updated_at'] ?? DateTime.now().toIso8601String()),
-    lanes: json['lanes'] != null
-        ? (json['lanes'] as List).map((e) => LaneDetailModel.fromJson(e)).toList()
-        : null,
-  );
-}
+    return LapanganDetailModel(
+      id: json['id_lapangan'] ?? '',
+      idPemilik: json['id_pemilik'] ?? '',
+      namaLapangan: json['nama_lapangan'] ?? '',
+      deskripsiLapangan: json['deskripsi_lapangan'] ?? '',
+      alamat: json['alamat_lapangan'] ?? '',
+      kecamatan: json['kecamatan'],
+      kabupaten: json['kabupaten'],
+      provinsi: json['provinsi'],
+      latitude: json['latitude']?.toDouble(),
+      longitude: json['longitude']?.toDouble(),
+      kapasitas: json['kapasitas_pemain'] ?? 0,
+      status: json['status_lapangan'] ?? '',
+      fasilitas: json['fasilitas'],
+      namaPerusahaan: json['nama_perusahaan'],
+      urlGambar: json['url_gambar'] != null
+          ? List<String>.from(json['url_gambar'])
+          : null,
+      createdAt: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
+      updatedAt: DateTime.parse(
+        json['updated_at'] ?? DateTime.now().toIso8601String(),
+      ),
+      lanes: json['lanes'] != null
+          ? (json['lanes'] as List)
+                .map((e) => LaneDetailModel.fromJson(e))
+                .toList()
+          : null,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -78,6 +87,7 @@ class LapanganDetailModel {
       'kapasitas': kapasitas,
       'status': status,
       'fasilitas': fasilitas,
+      'nama_perusahaan': namaPerusahaan,
       'url_gambar': urlGambar,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
@@ -98,6 +108,7 @@ class LaneDetailModel {
   final String? jenisOlahragaNama;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? namaPerusahaan;
 
   LaneDetailModel({
     required this.id,
@@ -112,6 +123,7 @@ class LaneDetailModel {
     this.jenisOlahragaNama,
     required this.createdAt,
     required this.updatedAt,
+    this.namaPerusahaan
   });
 
   factory LaneDetailModel.fromJson(Map<String, dynamic> json) {
@@ -124,12 +136,17 @@ class LaneDetailModel {
       kapasitas: json['kapasitas'] ?? 0,
       hargaPerJam: (json['harga_per_jam'] ?? 0).toDouble(),
       aktif: json['aktif'] ?? false,
-      urlGambar: json['url_gambar'] != null 
-          ? List<String>.from(json['url_gambar']) 
+      namaPerusahaan: json['nama_perusahaan'],
+      urlGambar: json['url_gambar'] != null
+          ? List<String>.from(json['url_gambar'])
           : null,
       jenisOlahragaNama: json['jenis_olahraga_nama'],
-      createdAt: DateTime.parse(json['created_at'] ?? DateTime.now().toIso8601String()),
-      updatedAt: DateTime.parse(json['updated_at'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['created_at'] ?? DateTime.now().toIso8601String(),
+      ),
+      updatedAt: DateTime.parse(
+        json['updated_at'] ?? DateTime.now().toIso8601String(),
+      ),
     );
   }
 
@@ -144,6 +161,7 @@ class LaneDetailModel {
       'harga_per_jam': hargaPerJam,
       'aktif': aktif,
       'url_gambar': urlGambar,
+      'nama_perusahaan': namaPerusahaan,
       'jenis_olahraga_nama': jenisOlahragaNama,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),

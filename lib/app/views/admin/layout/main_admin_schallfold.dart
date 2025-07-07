@@ -65,8 +65,8 @@ class MainAdminSchallfold extends StatelessWidget {
           label: 'Dashboard',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.search_rounded),
-          label: 'Cari',
+          icon: Icon(Icons.chat_bubble_outline),
+          label: 'Chat',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.note_add_outlined),

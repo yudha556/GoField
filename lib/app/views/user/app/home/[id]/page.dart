@@ -86,7 +86,7 @@ class _DetailLapanganState extends State<DetailLapangan> {
     return 'Rp ${amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
   }
 
-  void _showSnackBar(String message, {bool isError = false}) { 
+  void _showSnackBar(String message, {bool isError = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -98,15 +98,23 @@ class _DetailLapanganState extends State<DetailLapangan> {
   }
 
   void _handleBooking() {
-  if (_lapanganId != null) {
-    context.go(AppRoutes.userPaymentPath(_lapanganId!));
-  } else {
-    _showSnackBar('ID Lapangan tidak tersedia', isError: true);
+    if (_lapanganId != null) {
+      context.go(AppRoutes.userPaymentPath(_lapanganId!));
+    } else {
+      _showSnackBar('ID Lapangan tidak tersedia', isError: true);
+    }
   }
-}
 
   void _handleChat() {
-    _showSnackBar('Fitur chat akan segera tersedia');
+    if (_lapangan?.idPemilik != null && _lapanganId != null) {
+      final path = AppRoutes.userChatToOwnerPath(
+        _lapangan!.idPemilik!,
+        _lapanganId!,
+      );
+      context.go(path);
+    } else {
+      _showSnackBar('Data pemilik tidak tersedia', isError: true);
+    }
   }
 
   void _handleOpenMap() {
@@ -125,9 +133,9 @@ class _DetailLapanganState extends State<DetailLapangan> {
 
   String get _getStatusText {
     if (_lapangan?.status == null) return 'Status Tidak Diketahui';
-    
+
     final status = _lapangan!.status.toString().trim();
-    
+
     switch (status) {
       case 'buka':
         return 'buka';
@@ -142,9 +150,9 @@ class _DetailLapanganState extends State<DetailLapangan> {
 
   Color get _getStatusColor {
     if (_lapangan?.status == null) return Colors.grey;
-    
+
     final status = _lapangan!.status.toString().trim();
-    
+
     switch (status) {
       case 'buka':
         return Colors.green;
@@ -159,9 +167,9 @@ class _DetailLapanganState extends State<DetailLapangan> {
 
   IconData get _getStatusIcon {
     if (_lapangan?.status == null) return Icons.help_outline;
-    
+
     final status = _lapangan!.status.toString().trim();
-    
+
     switch (status) {
       case 'buka':
         return Icons.check_circle;
@@ -327,6 +335,7 @@ class _DetailLapanganState extends State<DetailLapangan> {
 
   Widget _buildContent() {
     final lowestPrice = _getLowestPrice();
+    final lapangan = _lapangan;
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -346,7 +355,10 @@ class _DetailLapanganState extends State<DetailLapangan> {
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 _lapangan!.namaLapangan,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               background: Stack(
                 fit: StackFit.expand,
@@ -531,6 +543,31 @@ class _DetailLapanganState extends State<DetailLapangan> {
                       ),
                       const SizedBox(height: 16),
                     ],
+                    // Nama Pemilik/Perusahaan
+                    if (_lapangan!.namaPerusahaan != null &&
+                        _lapangan!.namaPerusahaan!.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.business,
+                            size: 20,
+                            color: Color(0xFF0088E8),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Pemilik: ${_lapangan!.namaPerusahaan!}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF2D3748),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
 
                     // Kapasitas
                     Row(
@@ -555,11 +592,7 @@ class _DetailLapanganState extends State<DetailLapangan> {
 
                     Row(
                       children: [
-                        Icon(
-                          _getStatusIcon,
-                          size: 20,
-                          color: _getStatusColor,
-                        ),
+                        Icon(_getStatusIcon, size: 20, color: _getStatusColor),
                         const SizedBox(width: 12),
                         Text(
                           'Status: ${_getStatusText}',
@@ -687,7 +720,9 @@ class _DetailLapanganState extends State<DetailLapangan> {
                       ),
                       const SizedBox(height: 16),
 
-                      ...(_lapangan!.lanes!.where((lane) => lane.aktif).map((lane) {
+                      ...(_lapangan!.lanes!.where((lane) => lane.aktif).map((
+                        lane,
+                      ) {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(12),
@@ -704,7 +739,9 @@ class _DetailLapanganState extends State<DetailLapangan> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF0088E8).withOpacity(0.1),
+                                  color: const Color(
+                                    0xFF0088E8,
+                                  ).withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: const Icon(
@@ -780,17 +817,29 @@ class _DetailLapanganState extends State<DetailLapangan> {
                 const SizedBox(height: 16),
               ],
 
-              const SizedBox(height: 100), 
+              const SizedBox(height: 100),
             ]),
           ),
         ],
       ),
       bottomNavigationBar: DetailLapanganBottomBar(
         isAvailable: _isLapanganTersedia,
-        onChatPressed: _handleChat,
+        onChatPressed: () {
+          context.push(
+            AppRoutes.userChatToOwnerPath(
+              _lapangan!.idPemilik!, // ✅ dari LapanganDetailModel
+              _lapanganId!,
+            ),
+            extra: {
+              'contactName': _lapangan!.namaPerusahaan ?? 'Pemilik',
+              // 'contactAvatar': _lapangan!.fotoPemilik ?? '',
+            },
+          );
+        },
+
         onBookingPressed: _handleBooking,
         lowestPrice: lowestPrice,
-        status: _lapangan!.status,
+        status: lapangan?.status,
         lapanganId: _lapanganId!,
       ),
     );
