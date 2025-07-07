@@ -211,4 +211,50 @@ class ReservasiService {
       throw Exception('Error mengambil lapangan owner: ${e.toString()}');
     }
   }
+
+  Future<int> getTotalReservasiOwner(String userId) async {
+    final response = await fetchReservasiUntukOwner(userId);
+    return response.fold<int>(
+      0,
+      (sum, item) => sum + ((item['total_harga'] ?? 0) as num).toInt(),
+    );
+  }
+
+  Future<int> getTotalReservasiCount(String userId) async {
+    final response = await fetchReservasiUntukOwner(userId);
+    return response.length;
+  }
+
+  static Future<int> getTotalReservasi() async {
+    final response = await Supabase.instance.client
+        .from('reservasi')
+        .select('id_reservasi');
+
+    return response.length;
+  }
+
+  static Future<Map<int, int>> getReservasiPerHari() async {
+  final response = await Supabase.instance.client
+      .from('reservasi')
+      .select('tanggal_reservasi');
+
+  final Map<int, int> countPerDay = {
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+  };
+
+  for (var item in response) {
+    final tanggal = DateTime.parse(item['tanggal_reservasi']);
+    final weekdayIndex = tanggal.weekday % 7; // Flutter: Senin = 1 → Index = 1
+    countPerDay[weekdayIndex] = countPerDay[weekdayIndex]! + 1;
+  }
+
+  return countPerDay;
+}
+
 }

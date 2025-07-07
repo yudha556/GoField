@@ -16,7 +16,7 @@ class AppRoutes {
   static const String userDashboard = '/user/home';
 
   // user page
-  static const String userSearchPage = '/user/jadwal';
+  static const String userChatPage = '/user/jadwal';
   static const String usertransaksiPage = '/user/transaksi';
   static const String userprofilePage = '/user/profile';
   static const String userpromoPage = '/user/promo';
@@ -30,6 +30,9 @@ class AppRoutes {
   static String userPaymentPath(String id) => '/user/payment/$id';
   static String userCheckoutWithId(String id) => '/user/payment/$id';
   static const String userCheckoutPage = '/user/payment/checkout';
+  static const String userChatToOwner = '/user/chat/:ownerId/:lapanganId';
+  static String userChatToOwnerPath(String ownerId, String lapanganId) =>
+      '/user/chat/$ownerId/$lapanganId';
 
   // register owner
   static const String userRegisterToOwner = '/registerToOwner';
@@ -55,4 +58,5 @@ class AppRoutes {
   }
 
   static const String ownerConfirmPage = '/owner/confirm';
+  static const String ownerChatPage = '/owner/chat';
 }

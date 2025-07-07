@@ -4,6 +4,8 @@ import 'package:gofield/app/views/admin/app/home/components/barChartData.dart';
 import 'package:gofield/app/views/admin/layout/main_admin_schallfold.dart';
 import 'package:gofield/core/services/auth_service/auth_service.dart';
 import 'package:gofield/core/models/pengguna_model.dart';
+import 'package:gofield/core/services/lapanganService.dart';
+import 'package:gofield/core/services/reservasiService.dart';
 
 class AdminPage extends StatelessWidget {
   const AdminPage({super.key});
@@ -31,6 +33,11 @@ class AdminContent extends StatefulWidget {
 class _AdminContentState extends State<AdminContent> {
   PenggunaModel? _pengguna;
   bool isLoading = true;
+  int totalPengguna = 0;
+  int totalLapangan = 0;
+  int totalLapanganAktif = 0;
+  int totalReservasi = 0;
+  Map<int, int> statistikPerHari = {};
 
   @override
   void initState() {
@@ -40,9 +47,20 @@ class _AdminContentState extends State<AdminContent> {
 
   Future<void> _fetchPengguna() async {
     final result = await AuthService.getCurrentPengguna();
+    final pengguna = await AuthService.getTotalUser();
+    final lapangan = await LapanganService.getTotalLapangan();
+    final lapanganAktif = await LapanganService.getTotalLapanganAktif();
+    final reservasi = await ReservasiService.getTotalReservasi();
+    final statistik = await ReservasiService.getReservasiPerHari();
+
     setState(() {
       _pengguna = result;
       isLoading = false;
+      totalPengguna = pengguna;
+      totalLapangan = lapangan;
+      totalLapanganAktif = lapanganAktif;
+      totalReservasi = reservasi;
+      statistikPerHari = statistik;
     });
   }
 
@@ -51,7 +69,6 @@ class _AdminContentState extends State<AdminContent> {
       return 'Admin';
     }
     return namaLengkap.split(' ').first;
-    
   }
 
   Widget build(BuildContext context) {
@@ -149,7 +166,7 @@ class _AdminContentState extends State<AdminContent> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'Total User',
                             style: TextStyle(
@@ -160,7 +177,7 @@ class _AdminContentState extends State<AdminContent> {
                           ),
                           SizedBox(height: 12),
                           Text(
-                            '120',
+                            '$totalPengguna',
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.bold,
@@ -193,7 +210,7 @@ class _AdminContentState extends State<AdminContent> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'Total Lapangan Terdaftar',
                             style: TextStyle(
@@ -204,7 +221,7 @@ class _AdminContentState extends State<AdminContent> {
                           ),
                           SizedBox(height: 0),
                           Text(
-                            '50',
+                            '$totalLapangan',
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.bold,
@@ -237,9 +254,9 @@ class _AdminContentState extends State<AdminContent> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            'Total User',
+                            'Total Reservasi',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -248,7 +265,7 @@ class _AdminContentState extends State<AdminContent> {
                           ),
                           SizedBox(height: 12),
                           Text(
-                            '1500',
+                            '$totalReservasi',
                             style: TextStyle(
                               fontSize: 40,
                               fontWeight: FontWeight.bold,
@@ -279,9 +296,9 @@ class _AdminContentState extends State<AdminContent> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          'Total Lapangan Tersedia',
+                          'Total Lapangan Aktif',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -290,7 +307,7 @@ class _AdminContentState extends State<AdminContent> {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          '30',
+                          '$totalLapanganAktif',
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
@@ -373,7 +390,7 @@ class _AdminContentState extends State<AdminContent> {
                       ],
                     ),
                     const SizedBox(height: 30),
-                    Expanded(child: MyBarChart()),
+                    Expanded(child: MyBarChart(statistikData: statistikPerHari)),
                   ],
                 ),
               ),

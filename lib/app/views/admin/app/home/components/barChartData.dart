@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class MyBarChart extends StatefulWidget {
-  const MyBarChart({super.key});
+  final Map<int, int> statistikData;
+
+  const MyBarChart({super.key, required this.statistikData});
 
   @override
   State<MyBarChart> createState() => _MyBarChartState();
@@ -84,12 +86,8 @@ class _MyBarChartState extends State<MyBarChart> {
         ),
         titlesData: FlTitlesData(
           show: true,
-          rightTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
-          topTitles: AxisTitles(
-            sideTitles: SideTitles(showTitles: false),
-          ),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -106,9 +104,7 @@ class _MyBarChartState extends State<MyBarChart> {
             ),
           ),
         ),
-        borderData: FlBorderData(
-          show: false,
-        ),
+        borderData: FlBorderData(show: false),
         barGroups: showingGroups(),
         gridData: FlGridData(
           show: true,
@@ -116,10 +112,7 @@ class _MyBarChartState extends State<MyBarChart> {
           drawVerticalLine: false,
           horizontalInterval: 30,
           getDrawingHorizontalLine: (value) {
-            return FlLine(
-              color: Colors.grey.withOpacity(0.3),
-              strokeWidth: 1,
-            );
+            return FlLine(color: Colors.grey.withOpacity(0.3), strokeWidth: 1);
           },
         ),
       ),
@@ -148,7 +141,7 @@ class _MyBarChartState extends State<MyBarChart> {
       return Container();
     }
     return Padding(
-    padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.only(top: 8.0),
       child: Text(text, style: style),
     );
   }
@@ -186,32 +179,17 @@ class _MyBarChartState extends State<MyBarChart> {
         text = const Text('', style: style);
         break;
     }
-    return Padding(
-    padding: const EdgeInsets.only(top: 8.0),
-    child: text,
-  );
+    return Padding(padding: const EdgeInsets.only(top: 8.0), child: text);
   }
 
-  List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
-        switch (i) {
-          case 0:
-            return makeGroupData(0, 5, 12, isTouched: i == touchedIndex);
-          case 1:
-            return makeGroupData(1, 25, 35, isTouched: i == touchedIndex);
-          case 2:
-            return makeGroupData(2, 100, 80, isTouched: i == touchedIndex);
-          case 3:
-            return makeGroupData(3, 75, 90, isTouched: i == touchedIndex);
-          case 4:
-            return makeGroupData(4, 60, 45, isTouched: i == touchedIndex);
-          case 5:
-            return makeGroupData(5, 40, 55, isTouched: i == touchedIndex);
-          case 6:
-            return makeGroupData(6, 30, 40, isTouched: i == touchedIndex);
-          default:
-            return throw Error();
-        }
-      });
+  List<BarChartGroupData> showingGroups() {
+  return List.generate(7, (i) {
+    final y1 = widget.statistikData[i] ?? 0;
+    final y2 = 0.0; // Kalau mau bandingin sama minggu lalu atau target, isi di sini
+    return makeGroupData(i, y1.toDouble(), y2, isTouched: i == touchedIndex);
+  });
+}
+
 
   BarChartGroupData makeGroupData(
     int x,

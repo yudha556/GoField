@@ -27,10 +27,7 @@ class LapanganService {
           .from('lapangan')
           .select()
           .eq('id_pemilik', idPemilik)
-          .order(
-            'created_at',
-            ascending: false,
-          );
+          .order('created_at', ascending: false);
 
       return (res as List).map((e) => LapanganModel.fromJson(e)).toList();
     } catch (e) {
@@ -71,7 +68,9 @@ class LapanganService {
     }
   }
 
-  static Future<LapanganDetailModel?> getDetailLapangan(String idLapangan) async {
+  static Future<LapanganDetailModel?> getDetailLapangan(
+    String idLapangan,
+  ) async {
     try {
       print('Fetching detail lapangan: $idLapangan');
 
@@ -114,13 +113,15 @@ class LapanganService {
     }
   }
 
-  static Future<bool> updateStatusLapangan(String idLapangan, String status) async {
+  static Future<bool> updateStatusLapangan(
+    String idLapangan,
+    String status,
+  ) async {
     try {
-
       await _supabase
           .from('lapangan')
           .update({
-            'status_lapangan': status, 
+            'status_lapangan': status,
             'updated_at': DateTime.now().toIso8601String(),
           })
           .eq('id_lapangan', idLapangan);
@@ -131,7 +132,10 @@ class LapanganService {
     }
   }
 
-  static Future<bool> updateLapanganData(String idLapangan, Map<String, dynamic> data) async {
+  static Future<bool> updateLapanganData(
+    String idLapangan,
+    Map<String, dynamic> data,
+  ) async {
     try {
       data['updated_at'] = DateTime.now().toIso8601String();
 
@@ -154,10 +158,7 @@ class LapanganService {
           .delete()
           .eq('id_lapangan', idLapangan);
 
-      await _supabase
-          .from('lapangan')
-          .delete()
-          .eq('id_lapangan', idLapangan);
+      await _supabase.from('lapangan').delete().eq('id_lapangan', idLapangan);
 
       return true;
     } catch (e) {
@@ -185,10 +186,7 @@ class LapanganService {
   static Future<bool> deleteLane(String idLane) async {
     try {
       print('Deleting lane: $idLane');
-      await _supabase
-          .from('lane_lapangan')
-          .delete()
-          .eq('id_lane', idLane);
+      await _supabase.from('lane_lapangan').delete().eq('id_lane', idLane);
 
       return true;
     } catch (e) {
@@ -196,7 +194,9 @@ class LapanganService {
     }
   }
 
-  static Future<List<LapanganModel>> ambilSemuaLapangan({String? jenisOlahragaId}) async {
+  static Future<List<LapanganModel>> ambilSemuaLapangan({
+    String? jenisOlahragaId,
+  }) async {
     try {
       final response = await _supabase
           .from('lapangan')
@@ -210,7 +210,7 @@ class LapanganService {
 
       if (jenisOlahragaId != null) {
         List<LapanganModel> filteredLapangan = [];
-        
+
         for (var lapangan in lapanganList) {
           if (lapangan.id != null) {
             final lanesResponse = await _supabase
@@ -219,13 +219,13 @@ class LapanganService {
                 .eq('id_lapangan', lapangan.id!)
                 .eq('id_jenis_olahraga', jenisOlahragaId)
                 .eq('aktif', true);
-            
+
             if (lanesResponse.isNotEmpty) {
               filteredLapangan.add(lapangan);
             }
           }
         }
-        
+
         return filteredLapangan;
       }
 
@@ -243,9 +243,9 @@ class LapanganService {
           .eq('id_lapangan', idLapangan)
           .eq('aktif', true)
           .not('harga_per_jam', 'is', null);
-      
+
       if (lanesResponse.isEmpty) return null;
-      
+
       double? lowestPrice;
       for (var lane in lanesResponse) {
         final price = lane['harga_per_jam']?.toDouble();
@@ -255,14 +255,16 @@ class LapanganService {
           }
         }
       }
-      
+
       return lowestPrice;
     } catch (e) {
       return null;
     }
   }
 
-  static Future<List<LapanganModel>> ambilLapanganPopuler({int limit = 10}) async {
+  static Future<List<LapanganModel>> ambilLapanganPopuler({
+    int limit = 10,
+  }) async {
     try {
       final response = await _supabase
           .from('lapangan')
@@ -283,7 +285,9 @@ class LapanganService {
           .from('lapangan')
           .select()
           .eq('status_lapangan', 'tersedia')
-          .or('nama_lapangan.ilike.%$query%,kecamatan.ilike.%$query%,kabupaten.ilike.%$query%')
+          .or(
+            'nama_lapangan.ilike.%$query%,kecamatan.ilike.%$query%,kabupaten.ilike.%$query%',
+          )
           .order('created_at', ascending: false);
 
       return (response as List).map((e) => LapanganModel.fromJson(e)).toList();
@@ -311,5 +315,39 @@ class LapanganService {
     } catch (e) {
       throw Exception('Gagal mengambil lapangan terdekat: ${e.toString()}');
     }
+  }
+
+  static Future<int> getLapanganAktif(String userId) async {
+    final response = await Supabase.instance.client
+        .from('lapangan')
+        .select('id_lapangan')
+        .eq('id_pemilik', userId)
+        .eq('status_lapangan', 'buka');
+
+    return response.length;
+  }
+
+  Future<List<Map<String, dynamic>>> getLapanganList(String userId) async {
+    return await Supabase.instance.client
+        .from('lapangan')
+        .select()
+        .eq('id_pemilik', userId);
+  }
+
+  static Future<int> getTotalLapangan() async {
+    final response = await Supabase.instance.client
+        .from('lapangan')
+        .select('id_lapangan');
+
+    return response.length;
+  }
+
+  static Future<int> getTotalLapanganAktif() async {
+    final response = await Supabase.instance.client
+        .from('lapangan')
+        .select('id_lapangan')
+        .eq('status_lapangan', 'buka');
+
+    return response.length;
   }
 }

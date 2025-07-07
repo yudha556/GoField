@@ -98,7 +98,7 @@ class MainUserScaffold extends StatelessWidget {
         context.go(AppRoutes.userhomePage);
         break;
       case 1:
-        context.go(AppRoutes.userSearchPage);
+        context.go(AppRoutes.userChatPage);
         break;
       case 2:
         context.go(AppRoutes.usertransaksiPage);

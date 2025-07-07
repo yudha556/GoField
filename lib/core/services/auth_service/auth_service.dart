@@ -19,10 +19,10 @@ class AuthResult {
 
 class AuthService {
   static final _supabase = Supabase.instance.client;
-  
-  static final StreamController<AuthState> _authStateController = 
+
+  static final StreamController<AuthState> _authStateController =
       StreamController<AuthState>.broadcast();
-  
+
   static void initAuthListener() {
     _supabase.auth.onAuthStateChange.listen((data) {
       print('Auth state changed: ${data.event}');
@@ -36,23 +36,22 @@ class AuthService {
   static Future<void> checkAvailableProviders() async {
     try {
       print('Supabase URL from Env: ${Env.supabaseUrl}');
-      print('Supabase Key from Env: ${Env.supabaseAnonKey.substring(0, 20)}...');
+      print(
+        'Supabase Key from Env: ${Env.supabaseAnonKey.substring(0, 20)}...',
+      );
       print('Is Supabase configured: ${Env.isSupabaseConfigured}');
       print('App Name: ${Env.appName}');
       print('Debug Mode: ${Env.isDebug}');
-      
     } catch (e) {
       print('Provider check error: $e');
     }
   }
 
   // Sign up with Google OAuth - Updated untuk mobile
-  static Future<AuthResult> signUpWithGoogle({
-    required PeranEnum peran,
-  }) async {
+  static Future<AuthResult> signUpWithGoogle({required PeranEnum peran}) async {
     try {
       print('Starting Google OAuth flow...');
-      
+
       if (!Env.isSupabaseConfigured) {
         return AuthResult(
           success: false,
@@ -61,8 +60,8 @@ class AuthService {
       }
 
       // deep links
-      const String redirectUrl = 'com.example.gofield://auth/callback'; 
-      
+      const String redirectUrl = 'com.example.gofield://auth/callback';
+
       final bool result = await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: redirectUrl,
@@ -78,61 +77,64 @@ class AuthService {
 
       final completer = Completer<AuthResult>();
       late StreamSubscription subscription;
-      
+
       final timeout = Timer(const Duration(seconds: 60), () {
         if (!completer.isCompleted) {
           subscription.cancel();
-          completer.complete(AuthResult(
-            success: false,
-            message: 'Timeout: Proses pendaftaran memakan waktu terlalu lama.',
-          ));
+          completer.complete(
+            AuthResult(
+              success: false,
+              message:
+                  'Timeout: Proses pendaftaran memakan waktu terlalu lama.',
+            ),
+          );
         }
       });
 
       subscription = authStateChanges.listen((authState) async {
-        if (authState.event == AuthChangeEvent.signedIn && authState.session?.user != null) {
+        if (authState.event == AuthChangeEvent.signedIn &&
+            authState.session?.user != null) {
           timeout.cancel();
           subscription.cancel();
-          
+
           final callbackResult = await handleGoogleCallback(
             peran: peran,
             isSignUp: true,
           );
-          
+
           if (!completer.isCompleted) {
             completer.complete(callbackResult);
           }
         } else if (authState.event == AuthChangeEvent.signedOut) {
           timeout.cancel();
           subscription.cancel();
-          
+
           if (!completer.isCompleted) {
-            completer.complete(AuthResult(
-              success: false,
-              message: 'Pendaftaran dibatalkan atau gagal.',
-            ));
+            completer.complete(
+              AuthResult(
+                success: false,
+                message: 'Pendaftaran dibatalkan atau gagal.',
+              ),
+            );
           }
         }
       });
 
       return completer.future;
-
     } on AuthException catch (e) {
       print('Google Sign-Up Auth Error: ${e.message}');
-      
+
       String errorMessage = 'Gagal mendaftar dengan Google.';
       if (e.message.contains('redirect_uri_mismatch')) {
-        errorMessage = 'Konfigurasi Google OAuth belum benar.\n\nPastikan di Google Cloud Console:\n• Authorized redirect URIs: com.example.gofield://auth/callback';
+        errorMessage =
+            'Konfigurasi Google OAuth belum benar.\n\nPastikan di Google Cloud Console:\n• Authorized redirect URIs: com.example.gofield://auth/callback';
       } else if (e.message.contains('provider is not enabled')) {
         errorMessage = 'Google Sign-In belum diaktifkan di Supabase Dashboard.';
       } else if (e.message.contains('popup_closed_by_user')) {
         errorMessage = 'Pendaftaran dibatalkan oleh pengguna.';
       }
-      
-      return AuthResult(
-        success: false,
-        message: errorMessage,
-      );
+
+      return AuthResult(success: false, message: errorMessage);
     } catch (e) {
       print('Google Sign-Up General Error: $e');
       return AuthResult(
@@ -146,16 +148,16 @@ class AuthService {
   static Future<AuthResult> signInWithGoogle() async {
     try {
       print('Starting Google Sign-In flow...');
-      
+
       if (!Env.isSupabaseConfigured) {
         return AuthResult(
           success: false,
           message: 'Konfigurasi Supabase belum lengkap.',
         );
       }
-      
-      const String redirectUrl = 'com.example.gofield://auth/callback'; 
-      
+
+      const String redirectUrl = 'com.example.gofield://auth/callback';
+
       final bool result = await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: redirectUrl,
@@ -172,60 +174,62 @@ class AuthService {
       // Tunggu sampai auth state berubah atau timeout
       final completer = Completer<AuthResult>();
       late StreamSubscription subscription;
-      
+
       // Set timeout 60 detik
       final timeout = Timer(const Duration(seconds: 60), () {
         if (!completer.isCompleted) {
           subscription.cancel();
-          completer.complete(AuthResult(
-            success: false,
-            message: 'Timeout: Proses login memakan waktu terlalu lama.',
-          ));
+          completer.complete(
+            AuthResult(
+              success: false,
+              message: 'Timeout: Proses login memakan waktu terlalu lama.',
+            ),
+          );
         }
       });
 
       subscription = authStateChanges.listen((authState) async {
-        if (authState.event == AuthChangeEvent.signedIn && authState.session?.user != null) {
+        if (authState.event == AuthChangeEvent.signedIn &&
+            authState.session?.user != null) {
           timeout.cancel();
           subscription.cancel();
-          
+
           final callbackResult = await handleGoogleCallback(
-            peran: PeranEnum.pengguna, 
+            peran: PeranEnum.pengguna,
             isSignUp: false,
           );
-          
+
           if (!completer.isCompleted) {
             completer.complete(callbackResult);
           }
         } else if (authState.event == AuthChangeEvent.signedOut) {
           timeout.cancel();
           subscription.cancel();
-          
+
           if (!completer.isCompleted) {
-            completer.complete(AuthResult(
-              success: false,
-              message: 'Login dibatalkan atau gagal.',
-            ));
+            completer.complete(
+              AuthResult(
+                success: false,
+                message: 'Login dibatalkan atau gagal.',
+              ),
+            );
           }
         }
       });
 
       return completer.future;
-
     } on AuthException catch (e) {
       print('Google Sign-In Auth Error: ${e.message}');
-      
+
       String errorMessage = 'Gagal login dengan Google.';
       if (e.message.contains('redirect_uri_mismatch')) {
-        errorMessage = 'Konfigurasi Google OAuth belum benar.\n\nPastikan di Google Cloud Console:\n• Authorized redirect URIs: ${Env.supabaseUrl}/auth/v1/callback';
+        errorMessage =
+            'Konfigurasi Google OAuth belum benar.\n\nPastikan di Google Cloud Console:\n• Authorized redirect URIs: ${Env.supabaseUrl}/auth/v1/callback';
       } else if (e.message.contains('popup_closed_by_user')) {
         errorMessage = 'Login dibatalkan oleh pengguna.';
       }
-      
-      return AuthResult(
-        success: false,
-        message: errorMessage,
-      );
+
+      return AuthResult(success: false, message: errorMessage);
     } catch (e) {
       print('Google Sign-In General Error: $e');
       return AuthResult(
@@ -242,7 +246,7 @@ class AuthService {
   }) async {
     try {
       final User? user = _supabase.auth.currentUser;
-      
+
       if (user == null) {
         return AuthResult(
           success: false,
@@ -280,15 +284,16 @@ class AuthService {
       if (existingUser == null && isSignUp) {
         final userData = {
           'id_pengguna': user.id,
-          'nama_lengkap': user.userMetadata?['full_name'] ?? 
-                         user.userMetadata?['name'] ?? 
-                         user.email?.split('@')[0] ?? 
-                         'Pengguna Google',
+          'nama_lengkap':
+              user.userMetadata?['full_name'] ??
+              user.userMetadata?['name'] ??
+              user.email?.split('@')[0] ??
+              'Pengguna Google',
           'user_email': user.email ?? '',
           'nomor_telepon': '000000000',
           'peran': peran.name,
-          'foto_profil': user.userMetadata?['avatar_url'] ?? 
-                        user.userMetadata?['picture'],
+          'foto_profil':
+              user.userMetadata?['avatar_url'] ?? user.userMetadata?['picture'],
         };
 
         if (Env.isDebug) {
@@ -316,10 +321,9 @@ class AuthService {
           user: user,
         );
       }
-
     } on PostgrestException catch (e) {
       print('Database Error in Google callback: ${e.message}');
-      
+
       String errorMessage = 'Gagal menyimpan data profil Google.';
       if (e.code == '23505') {
         errorMessage = 'Data sudah ada. Login berhasil!';
@@ -329,16 +333,14 @@ class AuthService {
           user: _supabase.auth.currentUser,
         );
       }
-      
-      return AuthResult(
-        success: false,
-        message: errorMessage,
-      );
+
+      return AuthResult(success: false, message: errorMessage);
     } catch (e) {
       print('Google Callback General Error: $e');
       return AuthResult(
         success: false,
-        message: 'Terjadi kesalahan saat memproses akun Google: ${e.toString()}',
+        message:
+            'Terjadi kesalahan saat memproses akun Google: ${e.toString()}',
       );
     }
   }
@@ -346,10 +348,7 @@ class AuthService {
   // Resend verification email
   static Future<AuthResult> resendVerificationEmail(String email) async {
     try {
-      await _supabase.auth.resend(
-        type: OtpType.signup,
-        email: email,
-      );
+      await _supabase.auth.resend(type: OtpType.signup, email: email);
 
       return AuthResult(
         success: true,
@@ -409,41 +408,35 @@ class AuthService {
 
       return AuthResult(
         success: true,
-        message: 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.',
+        message:
+            'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.',
         needsEmailVerification: true,
         user: authResponse.user,
       );
-
     } on AuthException catch (e) {
       if (Env.isDebug) {
         print('Auth Error: ${e.message}');
       }
-      
+
       String errorMessage = 'Terjadi kesalahan saat membuat akun.';
       if (e.message.contains('already registered')) {
         errorMessage = 'Email sudah terdaftar. Silakan gunakan email lain.';
       } else if (e.message.contains('password')) {
         errorMessage = 'Password terlalu lemah. Minimal 6 karakter.';
       }
-      
-      return AuthResult(
-        success: false,
-        message: errorMessage,
-      );
+
+      return AuthResult(success: false, message: errorMessage);
     } on PostgrestException catch (e) {
       if (Env.isDebug) {
         print('Database Error: ${e.message}');
       }
-      
+
       String errorMessage = 'Gagal menyimpan data profil.';
       if (e.code == '23505') {
         errorMessage = 'Data sudah ada. Silakan gunakan data yang berbeda.';
       }
-      
-      return AuthResult(
-        success: false,
-        message: errorMessage,
-      );
+
+      return AuthResult(success: false, message: errorMessage);
     } catch (e) {
       if (Env.isDebug) {
         print('General Error: $e');
@@ -488,23 +481,19 @@ class AuthService {
         message: 'Login berhasil!',
         user: response.user,
       );
-
     } on AuthException catch (e) {
       if (Env.isDebug) {
         print('Login Error: ${e.message}');
       }
-      
+
       String errorMessage = 'Login gagal.';
       if (e.message.contains('Invalid login credentials')) {
         errorMessage = 'Email atau password salah.';
       } else if (e.message.contains('Email not confirmed')) {
         errorMessage = 'Email belum diverifikasi. Silakan cek email Anda.';
       }
-      
-      return AuthResult(
-        success: false,
-        message: errorMessage,
-      );
+
+      return AuthResult(success: false, message: errorMessage);
     } catch (e) {
       if (Env.isDebug) {
         print('Login General Error: $e');
@@ -569,30 +558,47 @@ class AuthService {
   }
 
   // Check if user has specific role
-static Future<bool> updatePengguna(PenggunaModel pengguna) async {
-  try {
-    final response = await Supabase.instance.client
-    .from('pengguna')
-    .update({
-      'nama_lengkap': pengguna.namaLengkap,
-      'nomor_telepon': pengguna.nomorTelepon,
-      'alamat': pengguna.alamat,
-      'image_url': pengguna.imageUrl,
-    })
-    .eq('id_pengguna', pengguna.idPengguna)
-    .select()
-    .maybeSingle();
+  static Future<bool> updatePengguna(PenggunaModel pengguna) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('pengguna')
+          .update({
+            'nama_lengkap': pengguna.namaLengkap,
+            'nomor_telepon': pengguna.nomorTelepon,
+            'alamat': pengguna.alamat,
+            'image_url': pengguna.imageUrl,
+          })
+          .eq('id_pengguna', pengguna.idPengguna)
+          .select()
+          .maybeSingle();
 
-    return response != null;
-  } catch (e) {
-    print('Update gagal: $e');
-    return false;
+      return response != null;
+    } catch (e) {
+      print('Update gagal: $e');
+      return false;
+    }
   }
-}
-
 
   // Dispose method untuk cleanup
   static void dispose() {
     _authStateController.close();
+  }
+
+  static Future<int> getTotalUser() async {
+    final response = await Supabase.instance.client
+        .from('pengguna')
+        .select('id_pengguna');
+
+    return response.length;
+  }
+
+  static Future<String?> getIdPemilikByPengguna(String idPengguna) async {
+    final data = await Supabase.instance.client
+        .from('pemilik_lapangan')
+        .select('id_pemilik')
+        .eq('id_pengguna', idPengguna)
+        .maybeSingle();
+
+    return data?['id_pemilik'];
   }
 }

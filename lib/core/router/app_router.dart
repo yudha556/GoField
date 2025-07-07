@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gofield/app/views/admin/app/peninjauan/%5Bid%5D/page.dart';
 import 'package:gofield/app/views/admin/app/profile/page.dart';
+import 'package:gofield/app/views/owner/app/chat/page.dart';
 import 'package:gofield/app/views/owner/app/confirm/page.dart';
 import 'package:gofield/app/views/splash/page.dart';
 import 'package:gofield/core/router/app_routes.dart';
@@ -12,7 +13,7 @@ import 'package:gofield/app/views/admin/app/home/page.dart' as AdminHome;
 import 'package:gofield/app/views/owner/app/home/page.dart' as OwnerHome;
 // user
 import 'package:gofield/app/views/user/app/home/page.dart' as UserHome;
-import 'package:gofield/app/views/user/app/search/page.dart' as UserSearchPage;
+import 'package:gofield/app/views/user/app/chat/page.dart' as UserSearchPage;
 import 'package:gofield/app/views/user/app/profile/page.dart' as UserProfile;
 import 'package:gofield/app/views/user/app/promo/page.dart' as UserPromo;
 import 'package:gofield/app/views/user/app/transaksi/page.dart'
@@ -26,6 +27,7 @@ import 'package:gofield/app/views/user/app/transaksi/[id]/page.dart'
 import 'package:gofield/app/views/user/app/home/[id]/page.dart';
 import 'package:gofield/app/views/user/app/payment/page.dart';
 import 'package:gofield/app/views/user/app/payment/[id]/page.dart';
+import 'package:gofield/app/views/user/app/chat/[id]/page.dart';
 
 // register to owner
 import 'package:gofield/app/views/user/app/registerOwner/page.dart'
@@ -43,6 +45,7 @@ import 'package:gofield/app/views/owner/app/lapangan/components/tambahLapangan.d
 import 'package:gofield/app/views/owner/app/lapangan/page.dart';
 import 'package:gofield/app/views/owner/app/lapangan/[id]/page.dart';
 import 'package:gofield/app/views/owner/app/profile/page.dart';
+import 'package:gofield/app/views/owner/app/chat/[id]/page.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
@@ -113,11 +116,11 @@ class AppRouter {
 
       // user page
       GoRoute(
-        path: AppRoutes.userSearchPage,
+        path: AppRoutes.userChatPage,
         name: 'JadwalPage',
         builder: (context, state) {
           print('Router: Building User Page');
-          return const UserSearchPage.SearchPage();
+          return const UserSearchPage.UserChat();
         },
       ),
       GoRoute(
@@ -160,7 +163,6 @@ class AppRouter {
         },
       ),
 
-      // PAYMENT ROUTES - PENTING: Checkout harus didefinisikan SEBELUM route dengan parameter :id
       GoRoute(
         path: '/user/payment/checkout',
         name: 'checkout',
@@ -175,6 +177,23 @@ class AppRouter {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return PaymentPage(lapanganId: id);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.userChatToOwner,
+        name: 'userChatToOwner',
+        builder: (context, state) {
+          final ownerId = state.pathParameters['ownerId']!;
+          final lapanganId = state.pathParameters['lapanganId']!;
+          final extra =
+              state.extra as Map<String, String>; // <== ambil data tambahan
+
+          return UserChatToOwnerPage(
+            contactName: extra['contactName'] ?? 'Pemilik',
+            contactAvatar: extra['contactAvatar'] ?? '',
+            ownerId: ownerId,
+            lapanganId: lapanganId,
+          );
         },
       ),
 
@@ -278,6 +297,31 @@ class AppRouter {
         name: 'owner confirm',
         builder: (context, state) {
           return const ConfirmPage();
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.ownerChatPage,
+        name: 'Owner Chat',
+        builder: (context, state) {
+          return const OwnerChat();
+        },
+      ),
+      GoRoute(
+        path: '/chat_detail',
+        name: 'ChatDetail',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+
+          if (extra == null) {
+            return const Scaffold(body: Center(child: Text('Data kosong')));
+          }
+
+          return UserChatToOwnerPage(
+            contactName: extra['contactName'],
+            contactAvatar: extra['contactAvatar'],
+            ownerId: extra['ownerId'],
+            lapanganId: extra['lapanganId'],
+          );
         },
       ),
     ],
